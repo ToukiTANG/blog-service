@@ -1,0 +1,38 @@
+server:
+  port: ${server.port}
+
+spring:
+  application:
+    name: BlogService
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 826474
+    url: jdbc:mysql://${mysql.host}:${mysql.port}/blog_schema?useUnicode=true&characterEncoding=UTF-8&serverTimeZone=Asia/Shanghai
+    druid:
+      max-active: 20
+      min-idle: 10
+      initial-size: 5
+      # 配置获取连接等待超时的时间
+      max-wait: 6000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 2000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 600000
+      max-evictable-idle-time-millis: 900000
+      validation-query: select 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      keep-alive: true
+      phy-max-use-count: 1000
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 默认路径其实就是resource目录下的mapper文件夹
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.touki.blog.entity
+
+logging:
+  level:
+    sql: debug
