@@ -11,7 +11,7 @@ import java.util.Date;
 @Data
 public class Tag {
     @TableId
-    private Integer tagId;
+    private Long tagId;
     private String tagName;
     private String description;
     private Date createTime;

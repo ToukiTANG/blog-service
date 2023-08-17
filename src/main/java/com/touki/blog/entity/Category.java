@@ -11,7 +11,7 @@ import java.util.Date;
 @Data
 public class Category {
     @TableId
-    private Integer categoryId;
+    private Long categoryId;
     private String categoryName;
     private String description;
     private Date createTime;

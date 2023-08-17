@@ -1,12 +1,15 @@
 package com.touki.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.touki.blog.constant.SiteDataConstant;
 import com.touki.blog.entity.Blog;
 import com.touki.blog.entity.Category;
 import com.touki.blog.entity.Content;
 import com.touki.blog.entity.Tag;
 import com.touki.blog.entity.vo.BlogInfo;
+import com.touki.blog.entity.vo.NewBlog;
 import com.touki.blog.entity.vo.PageResult;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
@@ -46,7 +49,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public PageResult<BlogInfo> getBlogInfos(Integer pageNum, Integer pageSize) {
         Page<Blog> blogPage = new Page<>(pageNum, pageSize);
-        Page<Blog> blogPageResult = blogMapper.selectPage(blogPage, null);
+        LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Blog::getTop);
+        Page<Blog> blogPageResult = this.page(blogPage, queryWrapper);
+        ArrayList<BlogInfo> blogInfos = getBlogInfos(blogPageResult);
+        PageResult<BlogInfo> pageResult = new PageResult<>();
+        pageResult.setPageSize(pageSize);
+        pageResult.setTotal(blogInfos.size());
+        pageResult.setDataList(blogInfos);
+        return pageResult;
+    }
+
+    private ArrayList<BlogInfo> getBlogInfos(Page<Blog> blogPageResult) {
         ArrayList<BlogInfo> blogInfos = new ArrayList<>();
         List<Blog> blogs = blogPageResult.getRecords();
         blogs.forEach(blog -> {
@@ -60,10 +74,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             blogInfo.setTags(tags);
             blogInfos.add(blogInfo);
         });
-        PageResult<BlogInfo> pageResult = new PageResult<>();
-        pageResult.setPageSize(pageSize);
-        pageResult.setTotal(blogInfos.size());
-        pageResult.setDataList(blogInfos);
-        return pageResult;
+        return blogInfos;
+    }
+
+    /**
+     * 查找最新博客，默认3条
+     *
+     * @return: java.util.List<com.touki.blog.entity.vo.NewBlog>
+     */
+    @Override
+    public List<NewBlog> getNewBlogs() {
+        return blogMapper.getNewBlogs(SiteDataConstant.NEW_BLOG_SIZE);
     }
 }
