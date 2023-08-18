@@ -3,7 +3,6 @@ package com.touki.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.touki.blog.constant.SiteDataConstant;
 import com.touki.blog.entity.Blog;
 import com.touki.blog.entity.Category;
 import com.touki.blog.entity.Content;
@@ -11,6 +10,7 @@ import com.touki.blog.entity.Tag;
 import com.touki.blog.entity.vo.BlogInfo;
 import com.touki.blog.entity.vo.NewBlog;
 import com.touki.blog.entity.vo.PageResult;
+import com.touki.blog.entity.vo.RandomBlog;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
 import com.touki.blog.mapper.ContentMapper;
@@ -78,12 +78,24 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     /**
-     * 查找最新博客，默认3条
+     * 查找size的最新文章NewBlog
      *
+     * @param size: size
      * @return: java.util.List<com.touki.blog.entity.vo.NewBlog>
      */
     @Override
-    public List<NewBlog> getNewBlogs() {
-        return blogMapper.getNewBlogs(SiteDataConstant.NEW_BLOG_SIZE);
+    public List<NewBlog> getNewBlogs(int size) {
+        return blogMapper.getNewBlogs(size);
+    }
+
+    /**
+     * 查找size的随机文章RandomBlog
+     *
+     * @param size : size
+     * @return: java.util.List<com.touki.blog.entity.vo.RandomBlog>
+     */
+    @Override
+    public List<RandomBlog> getRandomBlogs(int size) {
+        return blogMapper.getRandomBlogs(size);
     }
 }

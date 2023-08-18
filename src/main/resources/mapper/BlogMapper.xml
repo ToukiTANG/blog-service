@@ -7,6 +7,12 @@
         select blog_id, title
         from blog
         order by update_time desc
-        limit #{newBlogSize}
+        limit #{size}
+    </select>
+    <select id="getRandomBlogs" resultType="com.touki.blog.entity.vo.RandomBlog">
+        select blog_id, title, first_picture, create_time
+        from blog
+        order by rand()
+        limit #{size}
     </select>
 </mapper>

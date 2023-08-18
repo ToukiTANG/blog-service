@@ -5,6 +5,7 @@ import com.touki.blog.entity.Blog;
 import com.touki.blog.entity.vo.BlogInfo;
 import com.touki.blog.entity.vo.NewBlog;
 import com.touki.blog.entity.vo.PageResult;
+import com.touki.blog.entity.vo.RandomBlog;
 
 import java.util.List;
 
@@ -22,9 +23,18 @@ public interface BlogService extends IService<Blog> {
     PageResult<BlogInfo> getBlogInfos(Integer pageNum, Integer pageSize);
 
     /**
-     * 查找最新博客，默认3条
+     * 查找size的最新文章NewBlog
      *
+     * @param size: size
      * @return: java.util.List<com.touki.blog.entity.vo.NewBlog>
      */
-    List<NewBlog> getNewBlogs();
+    List<NewBlog> getNewBlogs(int size);
+
+    /**
+     * 查找size的随机文章RandomBlog
+     *
+     * @param size: size
+     * @return: java.util.List<com.touki.blog.entity.vo.RandomBlog>
+     */
+    List<RandomBlog> getRandomBlogs(int size);
 }
