@@ -39,4 +39,30 @@
         <bind name="query" value="'%'+queryString+'%'"/>
         where b.title like #{query} or c.text like #{query}
     </select>
+    <select id="archiveDate" resultType="java.lang.String">
+        select concat(year(create_time), '年', month(create_time), '月') yearMonth
+        from blog
+        group by yearMonth
+    </select>
+    <select id="archiveDetail" resultType="com.touki.blog.entity.vo.ArchiveBlog">
+        select concat(year(create_time), '年', month(create_time), '月') yearMonth, blog_id, title, day(create_time) day
+        from blog
+        order by create_time desc
+    </select>
+    <select id="archiveYearMonth" resultType="com.touki.blog.entity.Blog">
+        select blog_id,
+               title,
+               first_picture,
+               content_id,
+               description,
+               create_time,
+               update_time,
+               views,
+               top,
+               comment_enable,
+               category_id
+        from blog
+        where concat(year(create_time), '年', month(create_time), '月') = #{param2}
+        order by top desc, create_time desc
+    </select>
 </mapper>

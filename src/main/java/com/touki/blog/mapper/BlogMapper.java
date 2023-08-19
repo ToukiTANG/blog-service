@@ -3,6 +3,7 @@ package com.touki.blog.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.touki.blog.entity.Blog;
+import com.touki.blog.entity.vo.ArchiveBlog;
 import com.touki.blog.entity.vo.NewBlog;
 import com.touki.blog.entity.vo.RandomBlog;
 import com.touki.blog.entity.vo.SearchBlog;
@@ -47,4 +48,28 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @return: java.util.List<com.touki.blog.entity.vo.SearchBlog>
      */
     List<SearchBlog> searchBlog(String queryString);
+
+    /**
+     * 归档年月信息
+     *
+     * @return: java.util.List<java.lang.String>
+     */
+
+    List<String> archiveDate();
+
+    /**
+     * 归档详情
+     *
+     * @return: java.util.List<com.touki.blog.entity.vo.ArchiveBlog>
+     */
+    List<ArchiveBlog> archiveDetail();
+
+    /**
+     * 根据年月信息归档blog
+     *
+     * @param blogPage:分页
+     * @param yearMonth:年月信息，格式为"yyyy年MM月"
+     * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.touki.blog.entity.Blog>
+     */
+    Page<Blog> archiveYearMonth(Page<Blog> blogPage, String yearMonth);
 }

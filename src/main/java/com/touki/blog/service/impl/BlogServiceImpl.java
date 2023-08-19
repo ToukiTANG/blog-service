@@ -17,7 +17,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Touki
@@ -176,5 +178,42 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             searchBlog.setContentText(contentText.substring(index, end));
         });
         return searchBlogs;
+    }
+
+    /**
+     * 查询归档信息
+     *
+     * @return: com.touki.blog.entity.vo.ArchiveResult
+     */
+    @Override
+    public ArchiveResult getArchive() {
+        ArchiveResult archiveResult = new ArchiveResult();
+        long count = this.count();
+        archiveResult.setCount((int) count);
+        List<String> archiveYearMoth = blogMapper.archiveDate();
+        List<ArchiveBlog> archiveBlogs = blogMapper.archiveDetail();
+        HashMap<String, List<ArchiveBlog>> hashMap = new HashMap<>(8);
+        archiveYearMoth.forEach(ar -> {
+            List<ArchiveBlog> collect =
+                    archiveBlogs.stream().filter(blog -> blog.getYearMonth().equals(ar)).collect(Collectors.toList());
+            hashMap.put(ar, collect);
+        });
+        archiveResult.setResultMap(hashMap);
+        return archiveResult;
+    }
+
+    /**
+     * 通过年月字符串查询分页BlogInfo
+     *
+     * @param pageNum   :  第几页，从1开始
+     * @param pageSize  : 分页大小
+     * @param yearMonth : 年月，格式为"yyyy年MM月"
+     * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
+     */
+    @Override
+    public PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, int pageSize, String yearMonth) {
+        Page<Blog> blogPage = new Page<>(pageNum, pageSize);
+        Page<Blog> pageResult = blogMapper.archiveYearMonth(blogPage, yearMonth);
+        return getBlogInfoPageResult(pageSize, pageResult);
     }
 }

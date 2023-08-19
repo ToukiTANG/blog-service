@@ -70,4 +70,21 @@ public interface BlogService extends IService<Blog> {
      * @return: java.util.List<com.touki.blog.entity.vo.SearchBlog>
      */
     List<SearchBlog> searchBlog(String queryString);
+
+    /**
+     * 查询归档信息
+     *
+     * @return: com.touki.blog.entity.vo.ArchiveResult
+     */
+    ArchiveResult getArchive();
+
+    /**
+     * 通过年月字符串查询分页BlogInfo
+     *
+     * @param pageNum:   第几页，从1开始
+     * @param pageSize:  分页大小
+     * @param yearMonth: 年月，格式为"yyyy年MM月"
+     * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
+     */
+    PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, int pageSize, String yearMonth);
 }
