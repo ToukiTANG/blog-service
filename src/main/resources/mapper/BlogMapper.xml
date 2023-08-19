@@ -15,4 +15,28 @@
         order by rand()
         limit #{size}
     </select>
+    <select id="getBlogPageByTagId" resultType="com.touki.blog.entity.Blog">
+        select b.blog_id,
+               b.title,
+               b.first_picture,
+               b.content_id,
+               b.description,
+               b.create_time,
+               b.update_time,
+               b.views,
+               b.top,
+               b.comment_enable,
+               b.category_id
+        from blog_tag bt
+                 right join blog b on b.blog_id = bt.blog_id
+        where bt.tag_id = #{tagId}
+        order by b.update_time
+    </select>
+    <select id="searchBlog" resultType="com.touki.blog.entity.vo.SearchBlog">
+        select b.blog_id, b.title, c.text contentText
+        from blog b
+        join content c on b.content_id = c.content_id
+        <bind name="query" value="'%'+queryString+'%'"/>
+        where b.title like #{query} or c.text like #{query}
+    </select>
 </mapper>
