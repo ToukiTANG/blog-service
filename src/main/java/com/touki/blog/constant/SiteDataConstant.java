@@ -11,4 +11,5 @@ public abstract class SiteDataConstant {
     public static final int BLOG_HOME_SIZE = 5;
     public static final int SEARCH_QUERY_LEN_LIMIT = 6;
     public static final int ARCHIVE_YEARMONTH_SIZE = 5;
+    public static final int MOMENT_SIZE = 5;
 }
