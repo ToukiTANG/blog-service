@@ -30,7 +30,7 @@ public class TagController {
 
     @GetMapping
     public Result blogInfosByTagId(@RequestParam Long tagId,
-                                   @RequestParam(defaultValue = "1") int pageNum) {
+                                   @RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfosByTagId(tagId, pageNum,
                 SiteDataConstant.BLOG_TAG_SIZE);
         Tag tag = tagsService.getById(tagId);

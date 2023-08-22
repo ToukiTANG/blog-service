@@ -3,10 +3,15 @@ package com.touki.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.entity.Moment;
 import com.touki.blog.entity.vo.PageResult;
 import com.touki.blog.mapper.MomentMapper;
 import com.touki.blog.service.MomentService;
+import com.touki.blog.service.RedisService;
+import com.touki.blog.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> implements MomentService {
     private final MomentMapper momentMapper;
+    private final RedisService redisService;
 
-    public MomentServiceImpl(MomentMapper momentMapper) {
+    public MomentServiceImpl(MomentMapper momentMapper, RedisService redisService) {
         this.momentMapper = momentMapper;
+        this.redisService = redisService;
     }
 
     /**
@@ -31,6 +38,11 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
      */
     @Override
     public PageResult<Moment> momentPage(Integer pageNum, int pageSize) {
+        String jsonString = redisService.getHash(RedisKeyConstant.MOMENT, pageNum.toString());
+        if (!StringUtils.isBlank(jsonString)) {
+            return JsonUtil.readValue(jsonString, new TypeReference<PageResult<Moment>>() {
+            });
+        }
         Page<Moment> momentPage = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Moment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Moment::getCreateTime);
@@ -39,6 +51,7 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
         result.setDataList(page.getRecords());
         result.setTotal((int) page.getTotal());
         result.setPageSize(pageSize);
+        redisService.setHash(RedisKeyConstant.MOMENT, pageNum.toString(), JsonUtil.writeValueAsString(result));
         return result;
     }
 

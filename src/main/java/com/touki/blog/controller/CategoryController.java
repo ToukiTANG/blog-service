@@ -30,7 +30,7 @@ public class CategoryController {
 
     @GetMapping()
     public Result blogInfosByCategoryId(@RequestParam Long categoryId,
-                                        @RequestParam(defaultValue = "1") int pageNum) {
+                                        @RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfosByCategoryId(categoryId, pageNum,
                 SiteDataConstant.BLOG_CATEGORY_SIZE);
         Category category = categoryService.getById(categoryId);

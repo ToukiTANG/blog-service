@@ -51,7 +51,7 @@ public interface BlogService extends IService<Blog> {
      * @param pageSize:   分页大小
      * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
      */
-    PageResult<BlogInfo> getBlogInfosByCategoryId(Long categoryId, int pageNum, int pageSize);
+    PageResult<BlogInfo> getBlogInfosByCategoryId(Long categoryId, Integer pageNum, Integer pageSize);
 
     /**
      * 通过标签id查询分页BlogInfo
@@ -61,7 +61,7 @@ public interface BlogService extends IService<Blog> {
      * @param pageSize:分页大小
      * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
      */
-    PageResult<BlogInfo> getBlogInfosByTagId(Long tagId, int pageNum, int pageSize);
+    PageResult<BlogInfo> getBlogInfosByTagId(Long tagId, Integer pageNum, Integer pageSize);
 
     /**
      * 模糊查询标题与正文内容
@@ -86,5 +86,5 @@ public interface BlogService extends IService<Blog> {
      * @param yearMonth: 年月，格式为"yyyy年MM月"
      * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
      */
-    PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, int pageSize, String yearMonth);
+    PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, Integer pageSize, String yearMonth);
 }

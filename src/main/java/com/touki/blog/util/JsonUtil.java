@@ -1,6 +1,7 @@
 package com.touki.blog.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +42,15 @@ public abstract class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(src, valueType);
         } catch (IOException e) {
+            log.warn("序列化错误！{}", e.getMessage());
+        }
+        return null;
+    }
+
+    public static <T> T readValue(String content, TypeReference<T> typeReference) {
+        try {
+            return OBJECT_MAPPER.readValue(content, typeReference);
+        } catch (JsonProcessingException e) {
             log.warn("序列化错误！{}", e.getMessage());
         }
         return null;
