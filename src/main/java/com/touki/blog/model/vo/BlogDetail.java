@@ -1,27 +1,28 @@
-package com.touki.blog.entity;
+package com.touki.blog.model.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Content;
+import com.touki.blog.model.entity.Tag;
 import lombok.Data;
 
 import java.util.Date;
-
+import java.util.List;
 
 /**
  * @author Touki
  */
 @Data
-public class Blog {
-    @TableId(type = IdType.ASSIGN_ID)
+public class BlogDetail {
     private Long blogId;
     private String title;
     private String firstPicture;
-    private Long contentId;
+    private Content content;
     private String description;
     private Date createTime;
     private Date updateTime;
     private Integer views;
     private Boolean top;
     private Boolean commentEnable;
-    private Long categoryId;
+    private Category category;
+    private List<Tag> tags;
 }

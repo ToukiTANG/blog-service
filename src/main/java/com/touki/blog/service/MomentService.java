@@ -1,8 +1,8 @@
 package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.touki.blog.entity.Moment;
-import com.touki.blog.entity.vo.PageResult;
+import com.touki.blog.model.entity.Moment;
+import com.touki.blog.model.vo.PageResult;
 
 /**
  * @author Touki

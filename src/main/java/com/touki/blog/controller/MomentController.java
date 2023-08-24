@@ -1,9 +1,9 @@
 package com.touki.blog.controller;
 
 import com.touki.blog.constant.SiteDataConstant;
-import com.touki.blog.entity.Moment;
-import com.touki.blog.entity.vo.PageResult;
-import com.touki.blog.entity.vo.Result;
+import com.touki.blog.model.entity.Moment;
+import com.touki.blog.model.vo.PageResult;
+import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.MomentService;
 import org.springframework.web.bind.annotation.*;
 

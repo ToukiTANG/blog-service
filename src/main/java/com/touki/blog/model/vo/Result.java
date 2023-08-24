@@ -1,4 +1,4 @@
-package com.touki.blog.entity.vo;
+package com.touki.blog.model.vo;
 
 import com.touki.blog.constant.RespCode;
 import lombok.AllArgsConstructor;

@@ -3,19 +3,39 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.touki.blog.mapper.BlogMapper">
-    <select id="getNewBlogs" resultType="com.touki.blog.entity.vo.NewBlog">
+    <!--TODO blogInfo的映射-->
+    <resultMap id="blogInfoResult" type="com.touki.blog.model.vo.BlogInfo">
+        <id property="blogId" column="blog_id"/>
+        <result property="commentEnable" column="comment_enable"/>
+        <result property="createTime" column="create_time"/>
+        <result property="description" column="description"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="title" column="title"/>
+        <result property="top" column="top"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="views" column="views"/>
+        <association property="category" javaType="com.touki.blog.model.entity.Category">
+            <id property="categoryId" column="category_id"/>
+            <result property="categoryName" column="category_name"/>
+        </association>
+        <collection property="tags" ofType="com.touki.blog.model.entity.Tag">
+            <id property="tagId" column="tag_id"/>
+            <result property="tagName" column="tag_name"/>
+        </collection>
+    </resultMap>
+    <select id="getNewBlogs" resultType="com.touki.blog.model.vo.NewBlog">
         select blog_id, title
         from blog
         order by update_time desc
         limit #{size}
     </select>
-    <select id="getRandomBlogs" resultType="com.touki.blog.entity.vo.RandomBlog">
+    <select id="getRandomBlogs" resultType="com.touki.blog.model.vo.RandomBlog">
         select blog_id, title, first_picture, create_time
         from blog
         order by rand()
         limit #{size}
     </select>
-    <select id="getBlogPageByTagId" resultType="com.touki.blog.entity.Blog">
+    <select id="getBlogPageByTagId" resultType="com.touki.blog.model.entity.Blog">
         select b.blog_id,
                b.title,
                b.first_picture,
@@ -32,7 +52,7 @@
         where bt.tag_id = #{tagId}
         order by b.update_time
     </select>
-    <select id="searchBlog" resultType="com.touki.blog.entity.vo.SearchBlog">
+    <select id="searchBlog" resultType="com.touki.blog.model.vo.SearchBlog">
         select b.blog_id, b.title, c.text contentText
         from blog b
         join content c on b.content_id = c.content_id
@@ -40,16 +60,17 @@
         where b.title like #{query} or c.text like #{query}
     </select>
     <select id="archiveDate" resultType="java.lang.String">
-        select concat(year(create_time), '年', month(create_time), '月') yearMonth
+        select date_format(create_time, '%Y-%m') yearMonth
         from blog
         group by yearMonth
+        order by yearMonth desc
     </select>
-    <select id="archiveDetail" resultType="com.touki.blog.entity.vo.ArchiveBlog">
-        select concat(year(create_time), '年', month(create_time), '月') yearMonth, blog_id, title, day(create_time) day
+    <select id="archiveDetail" resultType="com.touki.blog.model.vo.ArchiveBlog">
+        select date_format(create_time, '%Y-%m') yearMonth, blog_id, title, day(create_time) day
         from blog
         order by create_time desc
     </select>
-    <select id="archiveYearMonth" resultType="com.touki.blog.entity.Blog">
+    <select id="archiveYearMonth" resultType="com.touki.blog.model.entity.Blog">
         select blog_id,
                title,
                first_picture,
@@ -64,5 +85,25 @@
         from blog
         where concat(year(create_time), '年', month(create_time), '月') = #{param2}
         order by top desc, create_time desc
+    </select>
+    <select id="getBlogInfos" resultMap="blogInfoResult">
+        select b.blog_id,
+               b.title,
+               b.first_picture,
+               b.description,
+               b.create_time,
+               b.update_time,
+               b.views,
+               b.top,
+               b.comment_enable,
+               c.category_Id,
+               c.category_name,
+               t.tag_id,
+               t.tag_name
+        from blog b
+                 join category c on b.category_id = c.category_Id
+                 join blog_tag bt on b.blog_id = bt.blog_id
+                 join tag t on t.tag_id = bt.tag_id
+        order by top, create_time
     </select>
 </mapper>

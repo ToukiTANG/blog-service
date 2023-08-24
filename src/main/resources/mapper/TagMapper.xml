@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.touki.blog.mapper.TagMapper">
 
-    <select id="findTagsByBlogId" resultType="com.touki.blog.entity.Tag">
+    <select id="findTagsByBlogId" resultType="com.touki.blog.model.entity.Tag">
         select t.tag_id, t.tag_name
         from tag t
                  left join blog_tag bt on t.tag_id = bt.tag_id

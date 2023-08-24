@@ -2,11 +2,8 @@ package com.touki.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.touki.blog.entity.Blog;
-import com.touki.blog.entity.vo.ArchiveBlog;
-import com.touki.blog.entity.vo.NewBlog;
-import com.touki.blog.entity.vo.RandomBlog;
-import com.touki.blog.entity.vo.SearchBlog;
+import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.vo.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -72,4 +69,12 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.touki.blog.entity.Blog>
      */
     Page<Blog> archiveYearMonth(Page<Blog> blogPage, String yearMonth);
+
+    /**
+     * 分页查询BlogInfo
+     *
+     * @param blogPage: 分页
+     * @return: java.util.List<com.touki.blog.entity.vo.BlogInfo>
+     */
+    Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogPage);
 }

@@ -1,4 +1,4 @@
-package com.touki.blog.entity.vo;
+package com.touki.blog.model.vo;
 
 import lombok.Data;
 
@@ -6,7 +6,8 @@ import lombok.Data;
  * @author Touki
  */
 @Data
-public class NewBlog {
+public class SearchBlog {
     private Long blogId;
     private String title;
+    private String contentText;
 }

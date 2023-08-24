@@ -43,7 +43,7 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   # 默认路径其实就是resource目录下的mapper文件夹
   mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.touki.blog.entity
+  type-aliases-package: com.touki.blog.model
 
 logging:
   level:

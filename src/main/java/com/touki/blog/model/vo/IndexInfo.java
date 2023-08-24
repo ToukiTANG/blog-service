@@ -1,7 +1,7 @@
-package com.touki.blog.entity.vo;
+package com.touki.blog.model.vo;
 
-import com.touki.blog.entity.Category;
-import com.touki.blog.entity.Tag;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Tag;
 import lombok.Data;
 
 import java.util.List;

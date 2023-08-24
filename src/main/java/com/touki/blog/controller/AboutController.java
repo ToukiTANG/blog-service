@@ -1,6 +1,6 @@
 package com.touki.blog.controller;
 
-import com.touki.blog.entity.vo.Result;
+import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.AboutService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

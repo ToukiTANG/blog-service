@@ -1,8 +1,8 @@
 package com.touki.blog.handler;
 
 import com.touki.blog.constant.RespCode;
-import com.touki.blog.entity.vo.Result;
 import com.touki.blog.exception.MyException;
+import com.touki.blog.model.vo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

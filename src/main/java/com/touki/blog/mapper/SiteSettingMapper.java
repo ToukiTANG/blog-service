@@ -1,7 +1,7 @@
 package com.touki.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.touki.blog.entity.SiteSetting;
+import com.touki.blog.model.entity.SiteSetting;
 import org.springframework.stereotype.Repository;
 
 /**

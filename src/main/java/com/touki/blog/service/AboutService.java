@@ -1,7 +1,7 @@
 package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.touki.blog.entity.About;
+import com.touki.blog.model.entity.About;
 
 import java.util.Map;
 

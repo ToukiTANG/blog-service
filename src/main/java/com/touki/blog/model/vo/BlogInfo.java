@@ -1,8 +1,7 @@
-package com.touki.blog.entity.vo;
+package com.touki.blog.model.vo;
 
-import com.touki.blog.entity.Category;
-import com.touki.blog.entity.Content;
-import com.touki.blog.entity.Tag;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Tag;
 import lombok.Data;
 
 import java.util.Date;
@@ -10,13 +9,13 @@ import java.util.List;
 
 /**
  * @author Touki
+ * 首页文章信息
  */
 @Data
-public class BlogDetail {
+public class BlogInfo {
     private Long blogId;
     private String title;
     private String firstPicture;
-    private Content content;
     private String description;
     private Date createTime;
     private Date updateTime;

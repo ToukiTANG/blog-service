@@ -1,10 +1,10 @@
 package com.touki.blog.controller;
 
 import com.touki.blog.constant.SiteDataConstant;
-import com.touki.blog.entity.Tag;
-import com.touki.blog.entity.vo.BlogInfo;
-import com.touki.blog.entity.vo.PageResult;
-import com.touki.blog.entity.vo.Result;
+import com.touki.blog.model.entity.Tag;
+import com.touki.blog.model.vo.BlogInfo;
+import com.touki.blog.model.vo.PageResult;
+import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.TagsService;
 import org.springframework.web.bind.annotation.GetMapping;

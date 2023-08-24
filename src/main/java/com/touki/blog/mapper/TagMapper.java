@@ -1,7 +1,7 @@
 package com.touki.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.touki.blog.entity.Tag;
+import com.touki.blog.model.entity.Tag;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

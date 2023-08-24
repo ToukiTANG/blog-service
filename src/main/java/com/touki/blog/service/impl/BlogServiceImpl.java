@@ -6,15 +6,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.touki.blog.constant.RedisKeyConstant;
-import com.touki.blog.entity.Blog;
-import com.touki.blog.entity.Category;
-import com.touki.blog.entity.Content;
-import com.touki.blog.entity.Tag;
-import com.touki.blog.entity.vo.*;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
 import com.touki.blog.mapper.ContentMapper;
 import com.touki.blog.mapper.TagMapper;
+import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Content;
+import com.touki.blog.model.entity.Tag;
+import com.touki.blog.model.vo.*;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.RedisService;
 import com.touki.blog.util.JsonUtil;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,15 +62,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             return JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
             });
         }
-        Page<Blog> blogPage = new Page<>(pageNum, pageSize);
-        LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByDesc(Blog::getTop).orderByDesc(Blog::getUpdateTime);
-        Page<Blog> blogPageResult = this.page(blogPage, queryWrapper);
-        ArrayList<BlogInfo> blogInfos = getBlogInfos(blogPageResult);
+        Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
+        Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage);
         PageResult<BlogInfo> pageResult = new PageResult<>();
         pageResult.setPageSize(pageSize);
-        pageResult.setTotal((int) blogPageResult.getTotal());
-        pageResult.setDataList(blogInfos);
+        pageResult.setTotal((int) blogInfos.getTotal());
+        pageResult.setDataList(blogInfos.getRecords());
         redisService.setHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum.toString(),
                 JsonUtil.writeValueAsString(pageResult));
         return pageResult;
@@ -234,7 +232,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         archiveResult.setCount((int) count);
         List<String> archiveYearMoth = blogMapper.archiveDate();
         List<ArchiveBlog> archiveBlogs = blogMapper.archiveDetail();
-        HashMap<String, List<ArchiveBlog>> hashMap = new HashMap<>(8);
+        // 这里需要保持顺序，因此使用LinkedHashMap
+        HashMap<String, List<ArchiveBlog>> hashMap = new LinkedHashMap<>(4);
         archiveYearMoth.forEach(ar -> {
             List<ArchiveBlog> collect =
                     archiveBlogs.stream().filter(blog -> blog.getYearMonth().equals(ar)).collect(Collectors.toList());

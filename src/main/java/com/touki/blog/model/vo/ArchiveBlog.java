@@ -1,4 +1,4 @@
-package com.touki.blog.entity.vo;
+package com.touki.blog.model.vo;
 
 import lombok.Data;
 

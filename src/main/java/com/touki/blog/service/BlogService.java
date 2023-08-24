@@ -1,8 +1,8 @@
 package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.touki.blog.entity.Blog;
-import com.touki.blog.entity.vo.*;
+import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.vo.*;
 
 import java.util.List;
 

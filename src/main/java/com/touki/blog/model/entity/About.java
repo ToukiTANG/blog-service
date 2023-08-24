@@ -1,4 +1,4 @@
-package com.touki.blog.entity;
+package com.touki.blog.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;

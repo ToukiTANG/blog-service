@@ -2,12 +2,12 @@ package com.touki.blog.controller;
 
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.constant.SiteDataConstant;
-import com.touki.blog.entity.Category;
-import com.touki.blog.entity.Tag;
-import com.touki.blog.entity.vo.IndexInfo;
-import com.touki.blog.entity.vo.NewBlog;
-import com.touki.blog.entity.vo.RandomBlog;
-import com.touki.blog.entity.vo.Result;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Tag;
+import com.touki.blog.model.vo.IndexInfo;
+import com.touki.blog.model.vo.NewBlog;
+import com.touki.blog.model.vo.RandomBlog;
+import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.*;
 import com.touki.blog.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
