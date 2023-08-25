@@ -11,6 +11,7 @@ import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.service.MomentService;
 import com.touki.blog.service.RedisService;
 import com.touki.blog.util.JsonUtil;
+import com.touki.blog.util.markdown.MarkdownUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,6 +48,7 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
         LambdaQueryWrapper<Moment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Moment::getCreateTime);
         Page<Moment> page = this.page(momentPage, queryWrapper);
+        page.getRecords().forEach(moment -> moment.setContent(MarkdownUtil.markdownToHtmlExtensions(moment.getContent())));
         PageResult<Moment> result = new PageResult<>();
         result.setDataList(page.getRecords());
         result.setTotal((int) page.getTotal());

@@ -36,7 +36,7 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @param tagId:    tagId
      * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.touki.blog.entity.Blog>
      */
-    Page<Blog> getBlogPageByTagId(Page<Blog> blogPage, Long tagId);
+    Page<BlogInfo> getBlogPageByTagId(Page<BlogInfo> blogPage, Long tagId);
 
     /**
      * 模糊查询标题与正文
@@ -71,10 +71,12 @@ public interface BlogMapper extends BaseMapper<Blog> {
     Page<Blog> archiveYearMonth(Page<Blog> blogPage, String yearMonth);
 
     /**
-     * 分页查询BlogInfo
+     * 分页动态查询blogInfos
      *
-     * @param blogPage: 分页
-     * @return: java.util.List<com.touki.blog.entity.vo.BlogInfo>
+     * @param blogInfoPage 分页
+     * @param categoryId   分类id，可为空
+     * @return Page<BlogInfo>
      */
-    Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogPage);
+    Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogInfoPage, Long categoryId);
+
 }

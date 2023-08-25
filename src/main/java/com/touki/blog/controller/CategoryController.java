@@ -28,7 +28,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping()
+    @GetMapping
     public Result blogInfosByCategoryId(@RequestParam Long categoryId,
                                         @RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfosByCategoryId(categoryId, pageNum,
