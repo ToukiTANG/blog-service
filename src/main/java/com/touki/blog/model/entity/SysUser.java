@@ -15,6 +15,7 @@ public class SysUser {
     private String nickname;
     private String avatar;
     private String email;
+    private Boolean enable;
     private Date createTime;
     private Date updateTime;
 }
