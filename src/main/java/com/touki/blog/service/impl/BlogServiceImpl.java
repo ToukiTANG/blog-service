@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.touki.blog.constant.RedisKeyConstant;
-import com.touki.blog.mapper.*;
-import com.touki.blog.model.dto.BlogTagDto;
+import com.touki.blog.mapper.BlogMapper;
+import com.touki.blog.mapper.CategoryMapper;
+import com.touki.blog.mapper.ContentMapper;
+import com.touki.blog.mapper.TagMapper;
 import com.touki.blog.model.entity.Blog;
 import com.touki.blog.model.entity.Category;
 import com.touki.blog.model.entity.Content;
@@ -20,7 +22,10 @@ import com.touki.blog.util.markdown.MarkdownUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -33,16 +38,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final RedisService redisService;
-    private final BlogTagDtoMapper blogTagDtoMapper;
 
     public BlogServiceImpl(BlogMapper blogMapper, ContentMapper contentMapper, CategoryMapper categoryMapper,
-                           TagMapper tagMapper, RedisService redisService, BlogTagDtoMapper blogTagDtoMapper) {
+                           TagMapper tagMapper, RedisService redisService) {
         this.blogMapper = blogMapper;
         this.contentMapper = contentMapper;
         this.categoryMapper = categoryMapper;
         this.tagMapper = tagMapper;
         this.redisService = redisService;
-        this.blogTagDtoMapper = blogTagDtoMapper;
     }
 
     /**
@@ -60,7 +63,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             });
         }
         Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
-        Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage, null);
+        Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage, null, null);
         PageResult<BlogInfo> pageResult = getPageResult(pageSize, blogInfos);
         redisService.setHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum.toString(),
                 JsonUtil.writeValueAsString(pageResult));
@@ -149,7 +152,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         LambdaQueryWrapper<Blog> blogQuery = new LambdaQueryWrapper<>();
         blogQuery.eq(Blog::getCategoryId, categoryId).orderByDesc(Blog::getTop).orderByDesc(Blog::getUpdateTime);
         Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
-        Page<BlogInfo> blogInfoPage = blogMapper.getBlogInfos(blogPage, categoryId);
+        Page<BlogInfo> blogInfoPage = blogMapper.getBlogInfos(blogPage, categoryId, null);
         PageResult<BlogInfo> pageResult = getPageResult(pageSize, blogInfoPage);
         redisService.setHash(RedisKeyConstant.CATEGORY_BLOG_INFO + categoryId, pageNum.toString(),
                 JsonUtil.writeValueAsString(pageResult));
@@ -172,39 +175,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             });
         }
         Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
-        Page<BlogInfo> selectPage = blogMapper.getBlogPageByTagId(blogPage, tagId);
-        // 拿到需要查询的blogIds
-        List<Long> blogIds = selectPage.getRecords().stream().map(BlogInfo::getBlogId).collect(Collectors.toList());
-        // 查询关联dto
-        List<BlogTagDto> blogTagDtos = blogTagDtoMapper.getListByBlogIds(blogIds);
-        // 分组聚合
-        Map<Long, List<BlogTagDto>> collect =
-                blogTagDtos.stream().collect(Collectors.groupingBy(BlogTagDto::getBlogId, Collectors.toList()));
-        // 设置tags
-        selectPage.getRecords().forEach(blogInfo -> {
-            List<BlogTagDto> dtos = collect.get(blogInfo.getBlogId());
-            List<Tag> tags = new ArrayList<>();
-            copyTags(dtos, tags);
-            blogInfo.setTags(tags);
-        });
-
-        PageResult<BlogInfo> pageResult = new PageResult<>();
-        pageResult.setPageSize(pageSize);
-        pageResult.setTotal((int) selectPage.getTotal());
-        pageResult.setDataList(selectPage.getRecords());
+        Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage, null, tagId);
+        PageResult<BlogInfo> pageResult = getPageResult(pageSize, blogInfos);
 
         redisService.setHash(RedisKeyConstant.TAG_BLOG_INFO + tagId, pageNum.toString(),
                 JsonUtil.writeValueAsString(pageResult));
         return pageResult;
     }
 
-    private static void copyTags(List<BlogTagDto> dtos, List<Tag> tags) {
-        dtos.forEach(d -> {
-            Tag tag = new Tag();
-            BeanUtils.copyProperties(d, tag);
-            tags.add(tag);
-        });
-    }
 
     private static PageResult<BlogInfo> getPageResult(Integer pageSize, Page<BlogInfo> blogInfoPage) {
         List<BlogInfo> records = blogInfoPage.getRecords();

@@ -30,15 +30,6 @@ public interface BlogMapper extends BaseMapper<Blog> {
     List<RandomBlog> getRandomBlogs(int size);
 
     /**
-     * 通过tagId查询分页Blog
-     *
-     * @param blogPage: 分页
-     * @param tagId:    tagId
-     * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.touki.blog.entity.Blog>
-     */
-    Page<BlogInfo> getBlogPageByTagId(Page<BlogInfo> blogPage, Long tagId);
-
-    /**
      * 模糊查询标题与正文
      *
      * @param queryString: 查询字符串
@@ -75,8 +66,9 @@ public interface BlogMapper extends BaseMapper<Blog> {
      *
      * @param blogInfoPage 分页
      * @param categoryId   分类id，可为空
+     * @param tagId        标签id，可空
      * @return Page<BlogInfo>
      */
-    Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogInfoPage, Long categoryId);
+    Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogInfoPage, Long categoryId, Long tagId);
 
 }
