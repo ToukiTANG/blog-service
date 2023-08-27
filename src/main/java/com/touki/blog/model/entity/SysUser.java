@@ -1,5 +1,6 @@
 package com.touki.blog.model.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
  */
 @Data
 public class SysUser {
+    @TableId
     private Long userId;
     private String username;
     private String password;
