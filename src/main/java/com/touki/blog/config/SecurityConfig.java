@@ -1,33 +1,52 @@
 package com.touki.blog.config;
 
+import com.touki.blog.constant.EndpointConstant;
+import com.touki.blog.filter.LoginFilter;
 import com.touki.blog.service.impl.SysUserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Collections;
-import java.util.List;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author Touki
  */
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
-    private final SysUserServiceImpl sysUserService;
+    private SysUserServiceImpl sysUserService;
 
     public SecurityConfig(SysUserServiceImpl sysUserService) {
         this.sysUserService = sysUserService;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager() {
-        List<AuthenticationProvider> providerList = Collections.singletonList(daoAuthenticationProvider());
-        return new ProviderManager(providerList);
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.
+                getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(sysUserService)
+                .and()
+                .build();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable().cors().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .requestMatchers().antMatchers(EndpointConstant.ADMIN).and()
+                .authorizeRequests().anyRequest().authenticated().and()
+                .addFilterAt(loginFilter(http), UsernamePasswordAuthenticationFilter.class)
+        ;
+        return http.build();
     }
 
     @Bean
@@ -36,10 +55,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(sysUserService);
-        return provider;
+    public LoginFilter loginFilter(HttpSecurity http) throws Exception {
+        LoginFilter loginFilter = new LoginFilter();
+        loginFilter.setAuthenticationManager(authenticationManager(http));
+        loginFilter.setFilterProcessesUrl("/login");
+        return loginFilter;
     }
 }
