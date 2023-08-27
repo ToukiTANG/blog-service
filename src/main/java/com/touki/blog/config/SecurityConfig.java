@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private SysUserServiceImpl sysUserService;
+    private final SysUserServiceImpl sysUserService;
 
     public SecurityConfig(SysUserServiceImpl sysUserService) {
         this.sysUserService = sysUserService;
