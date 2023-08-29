@@ -1,7 +1,7 @@
 package com.touki.blog.filter;
 
 import com.touki.blog.constant.RespCode;
-import com.touki.blog.model.vo.AuthUser;
+import com.touki.blog.model.dto.AuthUser;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.model.vo.TokenVo;
 import com.touki.blog.util.JwtUtil;

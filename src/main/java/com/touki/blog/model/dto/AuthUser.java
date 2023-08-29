@@ -1,4 +1,4 @@
-package com.touki.blog.model.vo;
+package com.touki.blog.model.dto;
 
 import com.touki.blog.model.entity.Role;
 import com.touki.blog.model.entity.SysUser;

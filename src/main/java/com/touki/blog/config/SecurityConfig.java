@@ -2,6 +2,9 @@ package com.touki.blog.config;
 
 import com.touki.blog.constant.EndpointConstant;
 import com.touki.blog.filter.LoginFilter;
+import com.touki.blog.filter.TokenFilter;
+import com.touki.blog.handler.MyAccessDeniedHandler;
+import com.touki.blog.handler.MyAuthenticationEntryPoint;
 import com.touki.blog.service.impl.SysUserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
     private final SysUserServiceImpl sysUserService;
+    private final MyAccessDeniedHandler accessDeniedHandler;
+    private final MyAuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(SysUserServiceImpl sysUserService) {
+    public SecurityConfig(SysUserServiceImpl sysUserService, MyAccessDeniedHandler accessDeniedHandler,
+                          MyAuthenticationEntryPoint authenticationEntryPoint) {
         this.sysUserService = sysUserService;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
@@ -43,8 +51,10 @@ public class SecurityConfig {
         http.csrf().disable().cors().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .requestMatchers().antMatchers(EndpointConstant.ADMIN).and()
-                .authorizeRequests().anyRequest().authenticated().and()
+                .authorizeRequests().antMatchers(EndpointConstant.ADMIN_LOGIN).permitAll().anyRequest().authenticated().and()
                 .addFilterAt(loginFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenFilter(), LoginFilter.class)
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationEntryPoint)
         ;
         return http.build();
     }
@@ -58,7 +68,12 @@ public class SecurityConfig {
     public LoginFilter loginFilter(HttpSecurity http) throws Exception {
         LoginFilter loginFilter = new LoginFilter();
         loginFilter.setAuthenticationManager(authenticationManager(http));
-        loginFilter.setFilterProcessesUrl("/login");
+        loginFilter.setFilterProcessesUrl(EndpointConstant.ADMIN_LOGIN);
         return loginFilter;
+    }
+
+    @Bean
+    public TokenFilter tokenFilter() {
+        return new TokenFilter();
     }
 }

@@ -1,7 +1,8 @@
 package com.touki.blog.util;
 
 
-import com.touki.blog.model.vo.AuthUser;
+import com.touki.blog.constant.DelimiterConstant;
+import com.touki.blog.model.dto.AuthUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,6 +14,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Touki
@@ -20,27 +22,38 @@ import java.util.UUID;
 public abstract class JwtUtil {
     public static final String JWT_KEY = "dahfuduabgjadbgaugweyugbajdgbnadaiughweiuhgadjnf";
     public static final SignatureAlgorithm ALGORITHM = SignatureAlgorithm.HS256;
-    public static final long AC_EXPIRATION = 86400L;
-    public static final long RE_EXPIRATION = 604800L;
+    /**
+     * ac_token一天过期
+     */
+    public static final long AC_EXPIRATION = 86400 * 1000L;
+    /**
+     * re_refresh七天过期
+     */
+    public static final long RE_EXPIRATION = 604800 * 1000L;
 
     public static String getJti() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     public static String createAccessToken(AuthUser authUser) {
-        Collection<? extends GrantedAuthority> authorities = authUser.getAuthorities();
-        return Jwts.builder().setSubject(String.valueOf(authUser.getUserId()))
-                .claim("authorities", authorities)
+        String collect = extractAuthorities(authUser);
+        return Jwts.builder().setSubject(String.valueOf(authUser.getUsername()))
+                .claim("authorities", collect)
                 .setId(getJti())
                 .signWith(generalKey(), ALGORITHM)
                 .setExpiration(new Date(System.currentTimeMillis() + AC_EXPIRATION))
                 .compact();
     }
 
-    public static String createRefreshToken(AuthUser authUser) {
+    private static String extractAuthorities(AuthUser authUser) {
         Collection<? extends GrantedAuthority> authorities = authUser.getAuthorities();
-        return Jwts.builder().setSubject(String.valueOf(authUser.getUserId()))
-                .claim("authorities", authorities)
+        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(DelimiterConstant.COMMA));
+    }
+
+    public static String createRefreshToken(AuthUser authUser) {
+        String collect = extractAuthorities(authUser);
+        return Jwts.builder().setSubject(String.valueOf(authUser.getUsername()))
+                .claim("authorities", collect)
                 .setId(getJti())
                 .signWith(generalKey(), ALGORITHM)
                 .setExpiration(new Date(System.currentTimeMillis() + RE_EXPIRATION))
