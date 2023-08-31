@@ -39,7 +39,7 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
      */
     @Override
     public PageResult<Moment> momentPage(Integer pageNum, int pageSize) {
-        String jsonString = redisService.getHash(RedisKeyConstant.MOMENT, pageNum.toString());
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.MOMENT, pageNum);
         if (!StringUtils.isBlank(jsonString)) {
             return JsonUtil.readValue(jsonString, new TypeReference<PageResult<Moment>>() {
             });
@@ -53,7 +53,7 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
         result.setDataList(page.getRecords());
         result.setTotal((int) page.getTotal());
         result.setPageSize(pageSize);
-        redisService.setHash(RedisKeyConstant.MOMENT, pageNum.toString(), JsonUtil.writeValueAsString(result));
+        redisService.setHash(RedisKeyConstant.MOMENT, pageNum, JsonUtil.writeValueAsString(result));
         return result;
     }
 

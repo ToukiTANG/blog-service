@@ -12,7 +12,7 @@ public interface RedisService {
      * @param value: value
      * @return: void
      */
-    void setHash(String key, String field, Object value);
+    void setHash(String key, Object field, Object value);
 
     /**
      * 判断是否有hashKey
@@ -21,16 +21,16 @@ public interface RedisService {
      * @param field:
      * @return: boolean
      */
-    boolean existHashKey(String key, String field);
+    boolean existHashKey(String key, Object field);
 
     /**
      * hash取值
      *
-     * @param key:   key
-     * @param field: field
-     * @return: java.lang.String
+     * @param key   key
+     * @param field field
+     * @return Object
      */
-    String getHash(String key, String field);
+    Object getHash(String key, Object field);
 
     /**
      * 判断是否有key

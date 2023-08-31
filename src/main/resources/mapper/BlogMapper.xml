@@ -4,21 +4,15 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.touki.blog.mapper.BlogMapper">
     <resultMap id="blogInfoResult" type="com.touki.blog.model.vo.BlogInfo">
-        <id property="blogId" column="blog_id"/>
-        <result property="commentEnable" column="comment_enable"/>
-        <result property="createTime" column="create_time"/>
-        <result property="description" column="description"/>
-        <result property="firstPicture" column="first_picture"/>
-        <result property="title" column="title"/>
-        <result property="top" column="top"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="views" column="views"/>
-        <association property="category" javaType="com.touki.blog.model.entity.Category">
-            <id property="categoryId" column="category_id"/>
-            <result property="categoryName" column="category_name"/>
-        </association>
-        <collection property="tags" ofType="com.touki.blog.model.entity.Tag" column="tagList"
+        <association property="category" javaType="com.touki.blog.model.vo.CategoryInfo"/>
+        <collection property="tags" ofType="com.touki.blog.model.vo.TagInfo" column="tagList"
                     select="tagsByBlogId"/>
+    </resultMap>
+
+    <resultMap id="BlogDetailResult" type="com.touki.blog.model.vo.BlogDetail">
+        <association property="category" javaType="com.touki.blog.model.vo.CategoryInfo"/>
+        <association property="content" javaType="com.touki.blog.model.vo.ContentInfo"/>
+        <collection property="tags" javaType="com.touki.blog.model.vo.TagInfo"/>
     </resultMap>
     <select id="getNewBlogs" resultType="com.touki.blog.model.vo.NewBlog">
         select blog_id, title
@@ -69,21 +63,26 @@
         from blog
         order by create_time desc
     </select>
-    <select id="archiveYearMonth" resultType="com.touki.blog.model.entity.Blog">
-        select blog_id,
-               title,
-               first_picture,
-               content_id,
-               description,
-               create_time,
-               update_time,
-               views,
-               top,
-               comment_enable,
-               category_id
-        from blog
-        where date_format(create_time, '%Y-%m') = #{param2}
-        order by top desc, create_time desc
+    <select id="archiveYearMonth" resultMap="blogInfoResult">
+        select b.blog_id,
+               b.title,
+               b.first_picture,
+               b.description,
+               b.create_time,
+               b.update_time,
+               b.views,
+               b.top,
+               b.comment_enable,
+               c.category_id,
+               c.category_name,
+               temp.tagList
+        from blog b
+                 join category c on b.category_id = c.category_id
+                 join (select blog_id, group_concat(tag_id) tagList
+                       from blog_tag
+                       group by blog_id) temp on temp.blog_id = b.blog_id
+        where date_format(b.create_time, '%Y-%m') = #{param2}
+        order by b.top desc, b.create_time desc
     </select>
     <select id="getBlogInfos" resultMap="blogInfoResult">
         select b.blog_id,
@@ -102,7 +101,7 @@
         join category c on b.category_id = c.category_id
         join (select blog_id, group_concat(tag_id) tagList
         from blog_tag
-        group by blog_id) temp on temp.blog_id=b.blog_id
+        group by blog_id) temp on temp.blog_id = b.blog_id
         <where>
             <if test="categoryId != null and category != ''">
                 and c.category_id = #{categoryId}
@@ -121,5 +120,28 @@
         <foreach collection="tagList.split(',')" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+    <select id="getBlogDetail" resultType="com.touki.blog.model.vo.BlogDetail">
+        select b.blog_id,
+               b.title,
+               b.first_picture,
+               b.content_id,
+               b.description,
+               b.create_time,
+               b.update_time,
+               b.views,
+               b.top,
+               b.comment_enable,
+               b.category_id,
+               c1.category_name,
+               c2.text,
+               t.tag_id,
+               t.tag_name
+        from blog b
+                 join category c1 on b.category_id = c1.category_id
+                 join content c2 on b.content_id = c2.content_id
+                 join blog_tag bt on b.blog_id = bt.blog_id
+                 join tag t on bt.tag_id = t.tag_id
+        where b.blog_id = #{blogId}
     </select>
 </mapper>

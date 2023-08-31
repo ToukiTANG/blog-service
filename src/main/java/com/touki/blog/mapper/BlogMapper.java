@@ -59,7 +59,7 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @param yearMonth:年月信息，格式为"yyyy年MM月"
      * @return: com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.touki.blog.entity.Blog>
      */
-    Page<Blog> archiveYearMonth(Page<Blog> blogPage, String yearMonth);
+    Page<BlogInfo> archiveYearMonth(Page<BlogInfo> blogPage, String yearMonth);
 
     /**
      * 分页动态查询blogInfos
@@ -71,4 +71,11 @@ public interface BlogMapper extends BaseMapper<Blog> {
      */
     Page<BlogInfo> getBlogInfos(Page<BlogInfo> blogInfoPage, Long categoryId, Long tagId);
 
+    /**
+     * 通过id查询文章详情
+     *
+     * @param blogId 文章id
+     * @return BlogDetail
+     */
+    BlogDetail getBlogDetail(Long blogId);
 }

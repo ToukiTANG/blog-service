@@ -24,7 +24,7 @@ public class RedisServiceImpl implements RedisService {
      * @return: void
      */
     @Override
-    public void setHash(String key, String field, Object value) {
+    public void setHash(String key, Object field, Object value) {
         redisTemplate.opsForHash().put(key, field, value);
     }
 
@@ -36,20 +36,20 @@ public class RedisServiceImpl implements RedisService {
      * @return: boolean
      */
     @Override
-    public boolean existHashKey(String key, String field) {
+    public boolean existHashKey(String key, Object field) {
         return redisTemplate.opsForHash().hasKey(key, field);
     }
 
     /**
      * hash取值
      *
-     * @param key   :   key
-     * @param field : field
-     * @return: java.lang.String
+     * @param key   key
+     * @param field field
+     * @return Object
      */
     @Override
-    public String getHash(String key, String field) {
-        return (String) redisTemplate.opsForHash().get(key, field);
+    public Object getHash(String key, Object field) {
+        return redisTemplate.opsForHash().get(key, field);
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.touki.blog.model.vo;
 
-import com.touki.blog.model.entity.Category;
-import com.touki.blog.model.entity.Tag;
 import lombok.Data;
 
 import java.util.Date;
@@ -22,6 +20,6 @@ public class BlogInfo {
     private Integer views;
     private Boolean top;
     private Boolean commentEnable;
-    private Category category;
-    private List<Tag> tags;
+    private CategoryInfo category;
+    private List<TagInfo> tags;
 }

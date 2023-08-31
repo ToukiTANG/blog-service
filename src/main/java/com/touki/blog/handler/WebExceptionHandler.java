@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class WebExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result exceptionHandle(Exception e) {
-        log.error(e.getMessage());
+        log.error("\n********************内部错误********************", e);
         return Result.message(RespCode.SERVER_ERROR, "服务器异常！");
     }
 

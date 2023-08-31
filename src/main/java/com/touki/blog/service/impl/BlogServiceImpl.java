@@ -7,25 +7,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.mapper.BlogMapper;
-import com.touki.blog.mapper.CategoryMapper;
-import com.touki.blog.mapper.ContentMapper;
-import com.touki.blog.mapper.TagMapper;
 import com.touki.blog.model.entity.Blog;
-import com.touki.blog.model.entity.Category;
 import com.touki.blog.model.entity.Content;
-import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.vo.*;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.RedisService;
 import com.touki.blog.util.JsonUtil;
 import com.touki.blog.util.markdown.MarkdownUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -34,17 +28,10 @@ import java.util.stream.Collectors;
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
     private final BlogMapper blogMapper;
-    private final ContentMapper contentMapper;
-    private final CategoryMapper categoryMapper;
-    private final TagMapper tagMapper;
     private final RedisService redisService;
 
-    public BlogServiceImpl(BlogMapper blogMapper, ContentMapper contentMapper, CategoryMapper categoryMapper,
-                           TagMapper tagMapper, RedisService redisService) {
+    public BlogServiceImpl(BlogMapper blogMapper, RedisService redisService) {
         this.blogMapper = blogMapper;
-        this.contentMapper = contentMapper;
-        this.categoryMapper = categoryMapper;
-        this.tagMapper = tagMapper;
         this.redisService = redisService;
     }
 
@@ -57,33 +44,34 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     public PageResult<BlogInfo> getBlogInfos(Integer pageNum, Integer pageSize) {
-        String jsonString = redisService.getHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum.toString());
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum);
         if (!StringUtils.isBlank(jsonString)) {
-            return JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
+            PageResult<BlogInfo> pageResult = JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
             });
+            getBlogInfoViews(Objects.requireNonNull(pageResult));
+            return pageResult;
         }
         Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
         Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage, null, null);
         PageResult<BlogInfo> pageResult = getPageResult(pageSize, blogInfos);
-        redisService.setHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum.toString(),
+        redisService.setHash(RedisKeyConstant.HOME_BLOG_INFO, pageNum,
                 JsonUtil.writeValueAsString(pageResult));
         return pageResult;
     }
 
-    private ArrayList<BlogInfo> getBlogInfos(Page<Blog> blogPageResult) {
-        ArrayList<BlogInfo> blogInfos = new ArrayList<>();
-        List<Blog> blogs = blogPageResult.getRecords();
-        blogs.forEach(blog -> {
-            BlogInfo blogInfo = new BlogInfo();
-            BeanUtils.copyProperties(blog, blogInfo);
-            blogInfo.setDescription(MarkdownUtil.markdownToHtmlExtensions(blogInfo.getDescription()));
-            Category category = categoryMapper.selectById(blog.getCategoryId());
-            blogInfo.setCategory(category);
-            List<Tag> tags = tagMapper.findTagsByBlogId(blog.getBlogId());
-            blogInfo.setTags(tags);
-            blogInfos.add(blogInfo);
+    private void getBlogInfoViews(PageResult<BlogInfo> pageResult) {
+        // TODO views增加策略待增加
+        pageResult.getDataList().forEach(blogInfo -> {
+            Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS, blogInfo.getBlogId());
+            // redis里没有就去则去数据库查
+            if (views == null) {
+                LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.select(Blog::getViews).eq(Blog::getBlogId, blogInfo.getBlogId());
+                Blog blog = blogMapper.selectOne(queryWrapper);
+                views = blog.getViews();
+            }
+            blogInfo.setViews(views);
         });
-        return blogInfos;
     }
 
     /**
@@ -116,20 +104,23 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     public BlogDetail getBlogDetailById(Long blogId) {
-        String jsonString = redisService.getHash(RedisKeyConstant.BLOG_DETAIL, blogId.toString());
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.BLOG_DETAIL, blogId.toString());
         if (!StringUtils.isBlank(jsonString)) {
-            return JsonUtil.readValue(jsonString, BlogDetail.class);
+            BlogDetail blogDetail = JsonUtil.readValue(jsonString, BlogDetail.class);
+            Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS,
+                    Objects.requireNonNull(blogDetail).getBlogId());
+            blogDetail.setViews(views);
+            return blogDetail;
         }
-        Blog blog = this.getById(blogId);
-        BlogDetail blogDetail = new BlogDetail();
-        BeanUtils.copyProperties(blog, blogDetail);
-        Content content = contentMapper.selectById(blog.getContentId());
+        BlogDetail blogDetail = blogMapper.getBlogDetail(blogId);
+        Content content = blogDetail.getContent();
+        String description = blogDetail.getDescription();
+        blogDetail.setDescription(MarkdownUtil.markdownToHtmlExtensions(description));
         content.setText(MarkdownUtil.markdownToHtmlExtensions(content.getText()));
         blogDetail.setContent(content);
-        Category category = categoryMapper.selectById(blog.getCategoryId());
-        blogDetail.setCategory(category);
-        List<Tag> tags = tagMapper.findTagsByBlogId(blogId);
-        blogDetail.setTags(tags);
+        Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS,
+                Objects.requireNonNull(blogDetail).getBlogId());
+        blogDetail.setViews(views);
         redisService.setHash(RedisKeyConstant.BLOG_DETAIL, blogId.toString(), JsonUtil.writeValueAsString(blogDetail));
         return blogDetail;
     }
@@ -144,10 +135,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     public PageResult<BlogInfo> getBlogInfosByCategoryId(Long categoryId, Integer pageNum, Integer pageSize) {
-        String jsonString = redisService.getHash(RedisKeyConstant.CATEGORY_BLOG_INFO + categoryId, pageNum.toString());
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.CATEGORY_BLOG_INFO + categoryId,
+                pageNum.toString());
         if (!StringUtils.isBlank(jsonString)) {
-            return JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
+            PageResult<BlogInfo> pageResult = JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
             });
+            getBlogInfoViews(Objects.requireNonNull(pageResult));
+            return pageResult;
         }
         LambdaQueryWrapper<Blog> blogQuery = new LambdaQueryWrapper<>();
         blogQuery.eq(Blog::getCategoryId, categoryId).orderByDesc(Blog::getTop).orderByDesc(Blog::getUpdateTime);
@@ -169,38 +163,38 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     public PageResult<BlogInfo> getBlogInfosByTagId(Long tagId, Integer pageNum, Integer pageSize) {
-        String jsonString = redisService.getHash(RedisKeyConstant.TAG_BLOG_INFO + tagId, pageNum.toString());
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.TAG_BLOG_INFO + tagId, pageNum.toString());
         if (!StringUtils.isBlank(jsonString)) {
-            return JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
+            PageResult<BlogInfo> pageResult = JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
             });
+            getBlogInfoViews(Objects.requireNonNull(pageResult));
+            return pageResult;
         }
         Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
         Page<BlogInfo> blogInfos = blogMapper.getBlogInfos(blogPage, null, tagId);
         PageResult<BlogInfo> pageResult = getPageResult(pageSize, blogInfos);
-
         redisService.setHash(RedisKeyConstant.TAG_BLOG_INFO + tagId, pageNum.toString(),
                 JsonUtil.writeValueAsString(pageResult));
         return pageResult;
     }
 
 
-    private static PageResult<BlogInfo> getPageResult(Integer pageSize, Page<BlogInfo> blogInfoPage) {
+    /**
+     * 把Page<BlogInfo>转换为PageResult<BlogInfo>，包括将description转化为markdown并设置views
+     *
+     * @param pageSize     分页大小
+     * @param blogInfoPage blogInfoPage
+     * @return PageResult<BlogInfo>
+     */
+    private PageResult<BlogInfo> getPageResult(Integer pageSize, Page<BlogInfo> blogInfoPage) {
         List<BlogInfo> records = blogInfoPage.getRecords();
         records.forEach(blogInfo -> blogInfo.setDescription(MarkdownUtil.markdownToHtmlExtensions(blogInfo.getDescription())));
         PageResult<BlogInfo> pageResult = new PageResult<>();
         pageResult.setPageSize(pageSize);
         pageResult.setTotal((int) blogInfoPage.getTotal());
         pageResult.setDataList(records);
+        getBlogInfoViews(pageResult);
         return pageResult;
-    }
-
-    private PageResult<BlogInfo> getBlogInfoPageResult(Integer pageSize, Page<Blog> page) {
-        ArrayList<BlogInfo> blogInfos = getBlogInfos(page);
-        PageResult<BlogInfo> infoPageResult = new PageResult<>();
-        infoPageResult.setDataList(blogInfos);
-        infoPageResult.setPageSize(pageSize);
-        infoPageResult.setTotal((int) page.getTotal());
-        return infoPageResult;
     }
 
     /**
@@ -263,16 +257,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      */
     @Override
     public PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, Integer pageSize, String yearMonth) {
-        String jsonString = redisService.getHash(RedisKeyConstant.BLOG_INFO_YEAR_MONTH, yearMonth);
+        PageResult<BlogInfo> pageResult;
+        String jsonString = (String) redisService.getHash(RedisKeyConstant.BLOG_INFO_YEAR_MONTH, yearMonth);
         if (!StringUtils.isBlank(jsonString)) {
-            return JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
+            pageResult = JsonUtil.readValue(jsonString, new TypeReference<PageResult<BlogInfo>>() {
             });
+            getBlogInfoViews(Objects.requireNonNull(pageResult));
+            return pageResult;
         }
-        Page<Blog> blogPage = new Page<>(pageNum, pageSize);
-        Page<Blog> pageResult = blogMapper.archiveYearMonth(blogPage, yearMonth);
-        PageResult<BlogInfo> blogInfoPageResult = getBlogInfoPageResult(pageSize, pageResult);
+        Page<BlogInfo> blogPage = new Page<>(pageNum, pageSize);
+        Page<BlogInfo> blogInfoPage = blogMapper.archiveYearMonth(blogPage, yearMonth);
+        pageResult = getPageResult(pageSize, blogInfoPage);
         redisService.setHash(RedisKeyConstant.BLOG_INFO_YEAR_MONTH, yearMonth,
-                JsonUtil.writeValueAsString(blogInfoPageResult));
-        return blogInfoPageResult;
+                JsonUtil.writeValueAsString(pageResult));
+        return pageResult;
     }
 }
