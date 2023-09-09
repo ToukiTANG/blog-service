@@ -46,14 +46,15 @@ public interface RedisService {
      * @param key: key
      * @return: java.lang.String
      */
-    String getValue(String key);
+    Object getValue(String key);
 
     /**
-     * 存储string
+     * 储存string
      *
-     * @param key:   key
-     * @param value: jsonString
-     * @return: void
+     * @param key   key
+     * @param value value
      */
-    void setValue(String key, String value);
+    void setValue(String key, Object value);
+
+    void incrementHash(String key, Object field, long i);
 }

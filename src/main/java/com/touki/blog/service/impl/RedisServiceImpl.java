@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RedisServiceImpl implements RedisService {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public RedisServiceImpl(RedisTemplate<String, String> redisTemplate) {
+    public RedisServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
+
 
     /**
      * 存储hash
@@ -66,11 +67,11 @@ public class RedisServiceImpl implements RedisService {
     /**
      * string取值
      *
-     * @param key : key
-     * @return: java.lang.String
+     * @param key: key
+     * @return Object
      */
     @Override
-    public String getValue(String key) {
+    public Object getValue(String key) {
         return redisTemplate.opsForValue().get(key);
     }
 
@@ -82,7 +83,12 @@ public class RedisServiceImpl implements RedisService {
      * @return: void
      */
     @Override
-    public void setValue(String key, String value) {
+    public void setValue(String key, Object value) {
         redisTemplate.opsForValue().set(key, value);
+    }
+
+    @Override
+    public void incrementHash(String key, Object field, long i) {
+        redisTemplate.opsForHash().increment(key, field, i);
     }
 }

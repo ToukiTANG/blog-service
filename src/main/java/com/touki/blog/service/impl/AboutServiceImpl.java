@@ -34,7 +34,7 @@ public class AboutServiceImpl extends ServiceImpl<AboutMapper, About> implements
      */
     @Override
     public Map<String, Object> getAboutInfo() {
-        String jsonString = redisService.getValue(RedisKeyConstant.ABOUT_INFO);
+        String jsonString = (String) redisService.getValue(RedisKeyConstant.ABOUT_INFO);
         if (!StringUtils.isBlank(jsonString)) {
             return JsonUtil.readValue(jsonString, new TypeReference<Map<String, Object>>() {
             });

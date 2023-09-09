@@ -9,8 +9,6 @@ import com.touki.blog.model.vo.NewBlog;
 import com.touki.blog.model.vo.RandomBlog;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.*;
-import com.touki.blog.util.JsonUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,9 +37,8 @@ public class IndexController {
 
     @GetMapping("/site")
     public Result getSite() {
-        String jsonString = redisService.getValue(RedisKeyConstant.SITE_SETTING_INFO);
-        if (!StringUtils.isBlank(jsonString)) {
-            IndexInfo indexInfo = JsonUtil.readValue(jsonString, IndexInfo.class);
+        IndexInfo indexInfo = (IndexInfo) redisService.getValue(RedisKeyConstant.SITE_SETTING_INFO);
+        if (indexInfo != null) {
             return Result.data(indexInfo);
         }
         HashMap<String, Object> resultMap = siteSettingService.getSitSettings();
@@ -51,14 +48,14 @@ public class IndexController {
         List<RandomBlog> randomBlogList = blogService.getRandomBlogs(SiteDataConstant.RANDOM_BLOG_SIZE);
         List<Category> categoryList = categoryService.list();
         List<Tag> tagList = tagsService.list();
-        IndexInfo indexInfo = new IndexInfo();
+        indexInfo = new IndexInfo();
         indexInfo.setSiteInfo(siteInfo);
         indexInfo.setIntroduction(introduction);
         indexInfo.setCategoryList(categoryList);
         indexInfo.setNewBlogList(newBlogList);
         indexInfo.setTagList(tagList);
         indexInfo.setRandomBlogList(randomBlogList);
-        redisService.setValue(RedisKeyConstant.SITE_SETTING_INFO, JsonUtil.writeValueAsString(indexInfo));
+        redisService.setValue(RedisKeyConstant.SITE_SETTING_INFO, indexInfo);
         return Result.data(indexInfo);
     }
 }
