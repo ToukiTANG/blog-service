@@ -1,5 +1,7 @@
 package com.touki.blog.service;
 
+import java.util.Map;
+
 /**
  * @author Touki
  */
@@ -56,5 +58,20 @@ public interface RedisService {
      */
     void setValue(String key, Object value);
 
+    /**
+     * hash值自增i
+     *
+     * @param key   key
+     * @param field field
+     * @param i     i
+     */
     void incrementHash(String key, Object field, long i);
+
+    /**
+     * 取hash的map
+     *
+     * @param key key
+     * @return Map<Object, Object>
+     */
+    Map<Object, Object> getHashMap(String key);
 }
