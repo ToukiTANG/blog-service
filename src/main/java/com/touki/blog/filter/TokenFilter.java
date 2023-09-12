@@ -3,7 +3,11 @@ package com.touki.blog.filter;
 import com.touki.blog.constant.DelimiterConstant;
 import com.touki.blog.constant.EndpointConstant;
 import com.touki.blog.constant.RespCode;
+import com.touki.blog.constant.TokenType;
+import com.touki.blog.model.dto.AuthUser;
 import com.touki.blog.model.vo.Result;
+import com.touki.blog.model.vo.TokenVo;
+import com.touki.blog.service.impl.SysUserServiceImpl;
 import com.touki.blog.util.JwtUtil;
 import com.touki.blog.util.NetworkUtil;
 import io.jsonwebtoken.Claims;
@@ -28,6 +32,11 @@ import java.util.List;
  * @author Touki
  */
 public class TokenFilter extends OncePerRequestFilter {
+    private final SysUserServiceImpl sysUserService;
+
+    public TokenFilter(SysUserServiceImpl sysUserService) {
+        this.sysUserService = sysUserService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -45,12 +54,22 @@ public class TokenFilter extends OncePerRequestFilter {
                     Claims claims = JwtUtil.parseJwt(token);
                     username = claims.getSubject();
                     authorities = claims.get("authorities", String.class);
-                    List<GrantedAuthority> authorityList =
-                            AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorityList);
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    filterChain.doFilter(request, response);
+                    String type = claims.get("type", String.class);
+
+                    if (TokenType.ACCESS_TOKEN.equals(type)) {
+                        List<GrantedAuthority> authorityList =
+                                AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(username, null, authorityList);
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        filterChain.doFilter(request, response);
+                    } else if (TokenType.REFRESH_TOKEN.equals(type)) {
+                        AuthUser authUser = (AuthUser) sysUserService.loadUserByUsername(username);
+                        String accessToken = JwtUtil.createAccessToken(authUser);
+                        String refreshToken = JwtUtil.createRefreshToken(authUser);
+                        TokenVo tokenVo = new TokenVo(accessToken, refreshToken);
+                        NetworkUtil.setJsonResponse(response, Result.data(tokenVo));
+                    }
                 } catch (MalformedJwtException e) {
                     NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, "非法token，认证失败！"));
                 } catch (ExpiredJwtException e) {

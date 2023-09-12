@@ -2,6 +2,7 @@ package com.touki.blog.util;
 
 
 import com.touki.blog.constant.DelimiterConstant;
+import com.touki.blog.constant.TokenType;
 import com.touki.blog.model.dto.AuthUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -39,6 +40,7 @@ public abstract class JwtUtil {
         String collect = extractAuthorities(authUser);
         return Jwts.builder().setSubject(String.valueOf(authUser.getUsername()))
                 .claim("authorities", collect)
+                .claim("type", TokenType.ACCESS_TOKEN)
                 .setId(getJti())
                 .signWith(generalKey(), ALGORITHM)
                 .setExpiration(new Date(System.currentTimeMillis() + AC_EXPIRATION))
@@ -54,6 +56,7 @@ public abstract class JwtUtil {
         String collect = extractAuthorities(authUser);
         return Jwts.builder().setSubject(String.valueOf(authUser.getUsername()))
                 .claim("authorities", collect)
+                .claim("type", TokenType.REFRESH_TOKEN)
                 .setId(getJti())
                 .signWith(generalKey(), ALGORITHM)
                 .setExpiration(new Date(System.currentTimeMillis() + RE_EXPIRATION))
