@@ -14,4 +14,11 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
      * @param newScheduleJob NewScheduleJob
      */
     void createJob(NewScheduleJob newScheduleJob);
+
+    /**
+     * 立即执行一次定时任务
+     *
+     * @param jobId 任务id
+     */
+    void execute(Long jobId);
 }

@@ -48,4 +48,10 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         this.save(scheduleJob);
         ScheduleUtil.createScheduleJob(scheduler, scheduleJob);
     }
+
+    @Override
+    public void execute(Long jobId) {
+        ScheduleJob scheduleJob = this.getById(jobId);
+        ScheduleUtil.run(scheduler, scheduleJob);
+    }
 }

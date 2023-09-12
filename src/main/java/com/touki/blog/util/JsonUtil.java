@@ -31,7 +31,7 @@ public abstract class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(content, valueType);
         } catch (JsonProcessingException e) {
-            log.warn("序列化错误！{}", e.getMessage());
+            log.warn("序列化错误！", e);
         }
         return null;
     }
@@ -47,7 +47,7 @@ public abstract class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(src, valueType);
         } catch (IOException e) {
-            log.warn("序列化错误！{}", e.getMessage());
+            log.warn("序列化错误！", e);
         }
         return null;
     }
@@ -56,7 +56,7 @@ public abstract class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(content, typeReference);
         } catch (JsonProcessingException e) {
-            log.warn("序列化错误！{}", e.getMessage());
+            log.warn("序列化错误！", e);
         }
         return null;
     }
@@ -71,7 +71,7 @@ public abstract class JsonUtil {
         try {
             return OBJECT_MAPPER.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            log.warn("序列化错误！{}", e.getMessage());
+            log.warn("序列化错误！", e);
         }
         return null;
     }

@@ -2,11 +2,11 @@ package com.touki.blog.schedule;
 
 import com.touki.blog.model.entity.ScheduleJobLog;
 import com.touki.blog.service.ScheduleJobLogService;
+import com.touki.blog.service.impl.ScheduleJobLogServiceImpl;
 import com.touki.blog.util.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.Date;
@@ -34,10 +34,10 @@ public class ScheduleJobExecutor extends QuartzJobBean {
             new ArrayBlockingQueue<>(QUEUE_CAPACITY), new ThreadPoolExecutor.AbortPolicy());
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) {
         // 从任务上下文中拿到任务
         ScheduleJob scheduleJob = (ScheduleJob) context.getMergedJobDataMap().get(ScheduleJob.JOB_PARAM_KEY);
-        ScheduleJobLogService logService = SpringContextUtil.getBean(ScheduleJobLogService.class);
+        ScheduleJobLogService logService = SpringContextUtil.getBean(ScheduleJobLogServiceImpl.class);
         ScheduleJobLog jobLog = new ScheduleJobLog();
         jobLog.setJobId(scheduleJob.getJobId());
         jobLog.setBeanName(scheduleJob.getBeanName());

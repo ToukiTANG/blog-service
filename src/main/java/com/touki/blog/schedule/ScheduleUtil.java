@@ -97,4 +97,16 @@ public class ScheduleUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static void run(Scheduler scheduler, ScheduleJob scheduleJob) {
+        try {
+            // 参数
+            JobDataMap dataMap = new JobDataMap();
+            dataMap.put(ScheduleJob.JOB_PARAM_KEY, scheduleJob);
+            scheduler.triggerJob(getJobKey(scheduleJob.getJobId()), dataMap);
+        } catch (SchedulerException e) {
+            log.warn("立即执行定时任务失败，任务id：{}", scheduleJob.getJobId());
+            throw new RuntimeException(e);
+        }
+    }
 }

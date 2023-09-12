@@ -230,14 +230,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     private void getBlogInfoViews(PageResult<BlogInfo> pageResult) {
         pageResult.getDataList().forEach(blogInfo -> {
-            Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS, blogInfo.getBlogId());
+            Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS,
+                    blogInfo.getBlogId().toString());
             // redis里没有就去则去数据库查
             if (views == null) {
                 LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
                 queryWrapper.select(Blog::getViews).eq(Blog::getBlogId, blogInfo.getBlogId());
                 Blog blog = blogMapper.selectOne(queryWrapper);
                 views = blog.getViews();
-                redisService.setHash(RedisKeyConstant.BLOG_VIEWS, blogInfo.getBlogId(), views);
+                redisService.setHash(RedisKeyConstant.BLOG_VIEWS, blogInfo.getBlogId().toString(), views);
             }
             blogInfo.setViews(views);
         });
@@ -263,16 +264,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
 
     private void setBlogViews(Long blogId, BlogDetail blogDetail) {
-        Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS, blogId);
+        Integer views = (Integer) redisService.getHash(RedisKeyConstant.BLOG_VIEWS, blogId.toString());
         if (views != null) {
-            redisService.incrementHash(RedisKeyConstant.BLOG_VIEWS, blogId, 1);
+            redisService.incrementHash(RedisKeyConstant.BLOG_VIEWS, blogId.toString(), 1);
             blogDetail.setViews(views + 1);
         } else {
             LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.select(Blog::getViews).eq(Blog::getBlogId, blogId);
             Blog blog = blogMapper.selectOne(queryWrapper);
             views = blog.getViews() + 1;
-            redisService.setHash(RedisKeyConstant.BLOG_VIEWS, blogId, views);
+            redisService.setHash(RedisKeyConstant.BLOG_VIEWS, blogId.toString(), views);
             blogDetail.setViews(views);
         }
     }

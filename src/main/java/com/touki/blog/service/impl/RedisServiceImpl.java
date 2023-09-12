@@ -4,11 +4,9 @@ import com.touki.blog.service.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Touki
@@ -100,10 +98,11 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Map<Object, Object> getHashMap(String key) {
-        Set<Object> keys = redisTemplate.opsForHash().keys(key);
-        List<Object> collect = new ArrayList<>(keys);
-        List<Object> objects = redisTemplate.opsForHash().multiGet(key, keys);
-        return collect.stream().collect(Collectors.toMap(c -> c,
-                c -> objects.get(collect.indexOf(c))));
+        return redisTemplate.opsForHash().entries(key);
+    }
+
+    @Override
+    public List<Object> multiGet(String key, Set<Object> fieldSet) {
+        return redisTemplate.opsForHash().multiGet(key, fieldSet);
     }
 }

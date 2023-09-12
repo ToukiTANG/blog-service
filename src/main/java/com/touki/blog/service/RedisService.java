@@ -1,6 +1,8 @@
 package com.touki.blog.service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Touki
@@ -74,4 +76,13 @@ public interface RedisService {
      * @return Map<Object, Object>
      */
     Map<Object, Object> getHashMap(String key);
+
+    /**
+     * 取hash的value列表
+     *
+     * @param key      key
+     * @param fieldSet keySet
+     * @return List<Object>
+     */
+    List<Object> multiGet(String key, Set<Object> fieldSet);
 }
