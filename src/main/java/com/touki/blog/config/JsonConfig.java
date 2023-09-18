@@ -1,5 +1,7 @@
 package com.touki.blog.config;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 /**
@@ -34,8 +37,9 @@ public class JsonConfig {
         return builder -> {
             // 全局配置序列化返回 JSON 处理
             JavaTimeModule javaTimeModule = new JavaTimeModule();
+            SimpleModule simpleModule = new SimpleModule();
             // Jackson 序列化 Long 类型超出 JS 最大最小值序列化位字符串转为 String，解决后端返回的类型在前端精度丢失的问题
-            javaTimeModule.addSerializer(Long.class, new StringSerializer());
+            simpleModule.addSerializer(Long.class, new StringSerializer());
 
             // Jackson 序列化 BigDecimal 类型为 String，解决后端返回的类型在前端精度丢失的问题
             javaTimeModule.addSerializer(BigDecimal.class, ToStringSerializer.instance);
@@ -64,8 +68,11 @@ public class JsonConfig {
                     new LocalTimeDeserializer(DateTimeFormatter.ISO_LOCAL_TIME));
             // Instant 反序列化
             javaTimeModule.addDeserializer(Instant.class, InstantDeserializer.INSTANT);
+            ArrayList<Module> modules = new ArrayList<>();
+            modules.add(javaTimeModule);
+            modules.add(simpleModule);
 
-            builder.modules(javaTimeModule);
+            builder.modules(modules);
             // 时区配置
             builder.timeZone(TimeZone.getDefault());
         };

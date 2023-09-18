@@ -2,10 +2,12 @@ package com.touki.blog.filter;
 
 import com.touki.blog.constant.RespCode;
 import com.touki.blog.model.dto.AuthUser;
+import com.touki.blog.model.vo.LoginVo;
 import com.touki.blog.model.vo.Result;
-import com.touki.blog.model.vo.TokenVo;
+import com.touki.blog.model.vo.UserVo;
 import com.touki.blog.util.JwtUtil;
 import com.touki.blog.util.NetworkUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -26,9 +28,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain, Authentication authResult) throws IOException {
         AuthUser authUser = (AuthUser) authResult.getPrincipal();
         String accessToken = JwtUtil.createAccessToken(authUser);
-        String refreshToken = JwtUtil.createRefreshToken(authUser);
-        TokenVo token = new TokenVo(accessToken, refreshToken);
-        NetworkUtil.setJsonResponse(response, Result.data(token));
+        UserVo user = new UserVo();
+        BeanUtils.copyProperties(authUser, user);
+        LoginVo loginVo = new LoginVo(accessToken, user);
+        NetworkUtil.setJsonResponse(response, Result.data(loginVo));
     }
 
     @Override

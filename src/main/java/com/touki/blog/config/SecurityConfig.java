@@ -74,6 +74,6 @@ public class SecurityConfig {
 
     @Bean
     public TokenFilter tokenFilter() {
-        return new TokenFilter(sysUserService);
+        return new TokenFilter();
     }
 }
