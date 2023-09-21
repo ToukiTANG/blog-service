@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.RedisService;
@@ -225,6 +226,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         blogPage = blogMapper.archiveYearMonth(blogPage, yearMonth);
         pageResult = getPageResult(pageSize, blogPage);
         redisService.setHash(RedisKeyConstant.BLOG_INFO_YEAR_MONTH, yearMonth, pageResult);
+        return pageResult;
+    }
+
+    @Override
+    public PageResult<BlogInfo> adminBlogs(AdminBlogQuery query) {
+        Page<BlogInfo> blogPage = new Page<>(query.getPageNum(), query.getPageSize());
+        blogPage = blogMapper.adminBlogs(blogPage, query);
+
+
+        PageResult<BlogInfo> pageResult = new PageResult<>();
+        pageResult.setPageSize(query.getPageSize());
+        pageResult.setTotal((int) blogPage.getTotal());
+        pageResult.setDataList(blogPage.getRecords());
         return pageResult;
     }
 

@@ -171,4 +171,32 @@
                        group by blog_id) temp on temp.blog_id = b.blog_id
         where b.blog_id = #{blogId}
     </select>
+    <select id="adminBlogs" resultMap="blogInfoResult">
+        select b.blog_id,
+        b.title,
+        b.first_picture,
+        b.description,
+        b.create_time,
+        b.update_time,
+        b.views,
+        b.top,
+        b.comment_enable,
+        c.category_id,
+        c.category_name,
+        temp.tagList
+        from blog b
+        join category c on b.category_id = c.category_id
+        join (select blog_id, group_concat(tag_id) tagList
+        from blog_tag
+        group by blog_id) temp on temp.blog_id = b.blog_id
+        <where>
+            <if test="query.categoryId != null">
+                and c.category_id = #{query.categoryId}
+            </if>
+            <if test="query.title != null">
+                and b.title like '%'||#{query.title}||'%'
+            </if>
+        </where>
+        order by b.create_time desc
+    </select>
 </mapper>

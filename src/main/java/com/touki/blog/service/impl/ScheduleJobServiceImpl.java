@@ -1,8 +1,11 @@
 package com.touki.blog.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.mapper.ScheduleJobMapper;
 import com.touki.blog.model.dto.NewScheduleJob;
+import com.touki.blog.model.query.BaseQuery;
+import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.schedule.ScheduleJob;
 import com.touki.blog.schedule.ScheduleUtil;
 import com.touki.blog.service.ScheduleJobService;
@@ -22,9 +25,11 @@ import java.util.List;
 public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, ScheduleJob> implements ScheduleJobService {
 
     private final Scheduler scheduler;
+    private final ScheduleJobMapper jobMapper;
 
-    public ScheduleJobServiceImpl(Scheduler scheduler) {
+    public ScheduleJobServiceImpl(Scheduler scheduler, ScheduleJobMapper jobMapper) {
         this.scheduler = scheduler;
+        this.jobMapper = jobMapper;
     }
 
     @PostConstruct
@@ -53,5 +58,17 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
     public void execute(Long jobId) {
         ScheduleJob scheduleJob = this.getById(jobId);
         ScheduleUtil.run(scheduler, scheduleJob);
+    }
+
+    @Override
+    public PageResult<ScheduleJob> jobs(BaseQuery query) {
+        Page<ScheduleJob> scheduleJobPage = new Page<>(query.getPageNum(), query.getPageSize());
+        scheduleJobPage = jobMapper.selectPage(scheduleJobPage, null);
+
+        PageResult<ScheduleJob> pageResult = new PageResult<>();
+        pageResult.setPageSize(query.getPageSize());
+        pageResult.setTotal((int) scheduleJobPage.getTotal());
+        pageResult.setDataList(scheduleJobPage.getRecords());
+        return pageResult;
     }
 }

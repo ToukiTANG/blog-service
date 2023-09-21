@@ -3,6 +3,7 @@ package com.touki.blog.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
 import org.springframework.stereotype.Repository;
 
@@ -78,4 +79,13 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @return BlogDetail
      */
     BlogDetail getBlogDetail(Long blogId);
+
+    /**
+     * 后台分页查询文章信息
+     *
+     * @param blogPage Page<BlogInfo>
+     * @param query    AdminBlogQuery
+     * @return Page<BlogInfo>
+     */
+    Page<BlogInfo> adminBlogs(Page<BlogInfo> blogPage, AdminBlogQuery query);
 }

@@ -2,6 +2,7 @@ package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
 
 import java.util.List;
@@ -87,4 +88,12 @@ public interface BlogService extends IService<Blog> {
      * @return: com.touki.blog.entity.vo.PageResult<com.touki.blog.entity.vo.BlogInfo>
      */
     PageResult<BlogInfo> getBlogInfosByYearMonth(Long pageNum, Integer pageSize, String yearMonth);
+
+    /**
+     * 后台分页查询文章列表
+     *
+     * @param query AdminBlogQuery
+     * @return PageResult<BlogInfo>
+     */
+    PageResult<BlogInfo> adminBlogs(AdminBlogQuery query);
 }
