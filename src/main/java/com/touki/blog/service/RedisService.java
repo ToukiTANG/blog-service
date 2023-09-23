@@ -85,4 +85,25 @@ public interface RedisService {
      * @return List<Object>
      */
     List<Object> multiGet(String key, Set<Object> fieldSet);
+
+    /**
+     * 删除key
+     *
+     * @param key key
+     */
+    void removeKey(String[] key);
+
+    /**
+     * 删除key
+     *
+     * @param key key
+     */
+    void removeKey(String key);
+
+    /**
+     * 模糊匹配删除key
+     *
+     * @param keyPattern String
+     */
+    void removeKeyPattern(String keyPattern);
 }

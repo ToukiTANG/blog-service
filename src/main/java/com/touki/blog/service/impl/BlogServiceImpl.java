@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
@@ -257,6 +258,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(keyPattern = "blog*")
     @Override
     public void updateTop(Long id, Boolean top) {
         LambdaUpdateWrapper<Blog> updateWrapper = new LambdaUpdateWrapper<>();
@@ -270,6 +272,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
+    @RemoveRedisCache(keyPattern = "blog*")
     @Transactional(rollbackFor = Exception.class)
     public void updateBlog(BlogUpdate blogUpdate) {
         // 判断分类情况

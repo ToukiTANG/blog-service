@@ -3,7 +3,9 @@ package com.touki.blog.service.impl;
 import com.touki.blog.service.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,5 +106,23 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public List<Object> multiGet(String key, Set<Object> fieldSet) {
         return redisTemplate.opsForHash().multiGet(key, fieldSet);
+    }
+
+    @Override
+    public void removeKey(String[] key) {
+        redisTemplate.delete(Arrays.asList(key));
+    }
+
+    @Override
+    public void removeKey(String key) {
+        redisTemplate.delete(key);
+    }
+
+    @Override
+    public void removeKeyPattern(String keyPattern) {
+        Set<String> keys = redisTemplate.keys(keyPattern);
+        if (!CollectionUtils.isEmpty(keys)) {
+            redisTemplate.delete(keys);
+        }
     }
 }
