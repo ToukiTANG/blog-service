@@ -36,6 +36,7 @@
             <result property="categoryName" column="category_name"/>
         </association>
         <association property="content" javaType="com.touki.blog.model.vo.ContentInfo">
+            <id property="contentId" column="content_id"/>
             <result property="text" column="text"/>
         </association>
         <collection property="tags" ofType="com.touki.blog.model.vo.TagInfo" column="tagList"
@@ -161,6 +162,7 @@
                b.comment_enable,
                b.category_id,
                c1.category_name,
+               c2.content_id,
                c2.text,
                temp.tagList
         from blog b
@@ -194,7 +196,7 @@
                 and c.category_id = #{query.categoryId}
             </if>
             <if test="query.title != null">
-                and b.title like '%'||#{query.title}||'%'
+                and b.title like concat('%',#{query.title},'%')
             </if>
         </where>
         order by b.create_time desc

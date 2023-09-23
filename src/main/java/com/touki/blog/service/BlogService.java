@@ -1,6 +1,8 @@
 package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.touki.blog.exception.MyException;
+import com.touki.blog.model.dto.BlogUpdate;
 import com.touki.blog.model.entity.Blog;
 import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
@@ -96,4 +98,27 @@ public interface BlogService extends IService<Blog> {
      * @return PageResult<BlogInfo>
      */
     PageResult<BlogInfo> adminBlogs(AdminBlogQuery query);
+
+    /**
+     * 更新文章置顶状态
+     *
+     * @param id  文章id
+     * @param top 置顶状态
+     */
+    void updateTop(Long id, Boolean top);
+
+    /**
+     * 返回文章原始内容（不转为html）
+     *
+     * @param id 文章id
+     * @return BlogDetail
+     */
+    BlogDetail getAdminBlogDetail(Long id);
+
+    /**
+     * 更新文章
+     *
+     * @param blogUpdate BlogUpdate
+     */
+    void updateBlog(BlogUpdate blogUpdate) throws MyException;
 }

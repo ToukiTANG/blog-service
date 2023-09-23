@@ -1,17 +1,20 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.exception.MyException;
+import com.touki.blog.model.dto.BlogUpdate;
 import com.touki.blog.model.entity.Category;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.query.AdminBlogQuery;
+import com.touki.blog.model.vo.BlogDetail;
 import com.touki.blog.model.vo.BlogInfo;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.CategoryService;
 import com.touki.blog.service.TagsService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,5 +53,33 @@ public class AdminBlogController {
         map.put("categories", categories);
         map.put("tags", tags);
         return Result.data(map);
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/blog/updateTop")
+    public Result updateTop(Long id, Boolean top) {
+        blogService.updateTop(id, top);
+        return Result.success();
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/blog/delete")
+    @Transactional(rollbackFor = Exception.class)
+    public Result deleteBlog(Long id) {
+        blogService.removeById(id);
+        return Result.success();
+    }
+
+    @GetMapping("/blog/get")
+    public Result getBlogById(Long id) {
+        BlogDetail blogDetail = blogService.getAdminBlogDetail(id);
+        return Result.data(blogDetail);
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/blog/update")
+    public Result updateBlog(@RequestBody BlogUpdate blogUpdate) throws MyException {
+        blogService.updateBlog(blogUpdate);
+        return Result.success();
     }
 }

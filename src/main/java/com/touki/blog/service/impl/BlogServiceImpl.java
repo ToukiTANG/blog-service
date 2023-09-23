@@ -1,22 +1,29 @@
 package com.touki.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.mapper.BlogMapper;
+import com.touki.blog.mapper.CategoryMapper;
+import com.touki.blog.mapper.TagMapper;
+import com.touki.blog.model.dto.BlogUpdate;
 import com.touki.blog.model.entity.Blog;
+import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
 import com.touki.blog.service.BlogService;
 import com.touki.blog.service.RedisService;
+import com.touki.blog.service.TagsService;
 import com.touki.blog.util.markdown.MarkdownUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,10 +33,17 @@ import java.util.stream.Collectors;
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
     private final BlogMapper blogMapper;
     private final RedisService redisService;
+    private final CategoryMapper categoryMapper;
+    private final TagsService tagsService;
+    private final TagMapper tagMapper;
 
-    public BlogServiceImpl(BlogMapper blogMapper, RedisService redisService) {
+    public BlogServiceImpl(BlogMapper blogMapper, RedisService redisService, CategoryMapper categoryMapper,
+                           TagsService tagsService, TagMapper tagMapper) {
         this.blogMapper = blogMapper;
         this.redisService = redisService;
+        this.categoryMapper = categoryMapper;
+        this.tagsService = tagsService;
+        this.tagMapper = tagMapper;
     }
 
     /**
@@ -240,6 +254,76 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         pageResult.setTotal((int) blogPage.getTotal());
         pageResult.setDataList(blogPage.getRecords());
         return pageResult;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateTop(Long id, Boolean top) {
+        LambdaUpdateWrapper<Blog> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Blog::getBlogId, id).set(Blog::getTop, top);
+        this.update(updateWrapper);
+    }
+
+    @Override
+    public BlogDetail getAdminBlogDetail(Long id) {
+        return blogMapper.getBlogDetail(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBlog(BlogUpdate blogUpdate) {
+        // 判断分类情况
+        handleCategory(blogUpdate);
+        // 判断标签情况
+        handleTags(blogUpdate);
+        Blog blog = new Blog();
+        BeanUtils.copyProperties(blogUpdate, blog);
+        this.updateById(blog);
+    }
+
+    private void handleTags(BlogUpdate blogUpdate) {
+        List<Object> tagList = blogUpdate.getTagList();
+
+        List<Long> newTagIds =
+                tagList.stream().map(tag -> (String) tag).filter(StringUtils::isNumeric).map(Long::valueOf).collect(Collectors.toList());
+        List<Tag> oldTags = tagMapper.findTagsByBlogId(blogUpdate.getBlogId());
+        // 过滤出不存在的id，就是需要删除的tag关系了
+        List<Long> deleteTagIds =
+                oldTags.stream().map(Tag::getTagId).filter(oldId -> !newTagIds.contains(oldId)).collect(Collectors.toList());
+        if (!deleteTagIds.isEmpty()) {
+            tagMapper.deleteBlogTagConnect(blogUpdate.getBlogId(), deleteTagIds);
+        }
+
+        List<String> newTagNames =
+                tagList.stream().map(tag -> (String) tag).filter(tag -> !StringUtils.isNumeric(tag)).collect(Collectors.toList());
+        Date date = new Date();
+        List<Tag> newTags = newTagNames.stream().map(tagName -> {
+            Tag tag = new Tag();
+            tag.setTagName(tagName);
+            tag.setDescription("");
+            tag.setCreateTime(date);
+            tag.setUpdateTime(date);
+            return tag;
+        }).collect(Collectors.toList());
+        tagsService.saveBatch(newTags);
+        List<Long> newIds = newTags.stream().map(Tag::getTagId).collect(Collectors.toList());
+        tagMapper.insertBlogTag(blogUpdate.getBlogId(), newIds);
+    }
+
+    private void handleCategory(BlogUpdate blogUpdate) {
+        String cate = (String) blogUpdate.getCate();
+        if (StringUtils.isNumeric(cate)) {
+            blogUpdate.setCategoryId(Long.valueOf(cate));
+        } else {
+            Category newCategory = new Category();
+            newCategory.setCategoryName(cate);
+            newCategory.setDescription("");
+            Date date = new Date();
+            newCategory.setCreateTime(date);
+            newCategory.setUpdateTime(date);
+            categoryMapper.insert(newCategory);
+            blogUpdate.setCategoryId(newCategory.getCategoryId());
+        }
     }
 
     private void getBlogInfoViews(PageResult<BlogInfo> pageResult) {
