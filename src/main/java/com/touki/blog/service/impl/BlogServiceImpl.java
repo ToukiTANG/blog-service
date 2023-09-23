@@ -281,6 +281,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         handleTags(blogUpdate);
         Blog blog = new Blog();
         BeanUtils.copyProperties(blogUpdate, blog);
+        blog.setUpdateTime(new Date());
         this.updateById(blog);
     }
 
