@@ -262,7 +262,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public void updateTop(Long id, Boolean top) {
         LambdaUpdateWrapper<Blog> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Blog::getBlogId, id).set(Blog::getTop, top);
+        updateWrapper.eq(Blog::getBlogId, id).set(Blog::getTop, top).set(Blog::getUpdateTime, new Date());
         this.update(updateWrapper);
     }
 
