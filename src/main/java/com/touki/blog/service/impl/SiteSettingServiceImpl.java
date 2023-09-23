@@ -1,8 +1,11 @@
 package com.touki.blog.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.touki.blog.annotation.RemoveRedisCache;
+import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.constant.SiteSettingName;
 import com.touki.blog.mapper.SiteSettingMapper;
+import com.touki.blog.model.dto.SiteSettingsUpdate;
 import com.touki.blog.model.entity.SiteSetting;
 import com.touki.blog.model.vo.Copyright;
 import com.touki.blog.model.vo.Favorite;
@@ -11,10 +14,12 @@ import com.touki.blog.model.vo.Introduction;
 import com.touki.blog.service.SiteSettingService;
 import com.touki.blog.util.JsonUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Touki
@@ -81,5 +86,38 @@ public class SiteSettingServiceImpl extends ServiceImpl<SiteSettingMapper, SiteS
         resultMap.put("introduction", introduction);
         resultMap.put("siteInfo", siteInfo);
         return resultMap;
+    }
+
+    @Override
+    public Map<String, List<SiteSetting>> getAdminList() {
+        List<SiteSetting> siteSettings = this.list();
+        List<SiteSetting> type1 = new ArrayList<>();
+        List<SiteSetting> type2 = new ArrayList<>();
+        for (SiteSetting s : siteSettings) {
+            switch (s.getType()) {
+                case 1:
+                    type1.add(s);
+                    break;
+                case 2:
+                    type2.add(s);
+                    break;
+                default:
+                    break;
+            }
+        }
+        Map<String, List<SiteSetting>> map = new HashMap<>(8);
+        map.put("type1", type1);
+        map.put("type2", type2);
+        return map;
+    }
+
+    @Override
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSiteSettings(SiteSettingsUpdate siteSettingsUpdate) {
+        List<Long> deleteIds = siteSettingsUpdate.getDeleteIds();
+        this.removeBatchByIds(deleteIds);
+        List<SiteSetting> settings = siteSettingsUpdate.getSettings();
+        this.saveOrUpdateBatch(settings);
     }
 }
