@@ -14,10 +14,12 @@
         delete
         from blog_tag
         where blog_id = #{blogId}
-        and tag_id in
-        <foreach collection="deleteTagIds" item="tagId" open="(" separator="," close=")">
-            #{tagId}
-        </foreach>
+        <if test="deleteTagIds != null">
+            and tag_id in
+            <foreach collection="deleteTagIds" item="tagId" open="(" separator="," close=")">
+                #{tagId}
+            </foreach>
+        </if>
     </delete>
 
     <select id="findTagsByBlogId" resultType="com.touki.blog.model.entity.Tag">

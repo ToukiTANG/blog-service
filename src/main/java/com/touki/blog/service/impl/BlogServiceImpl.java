@@ -313,6 +313,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         handleTagsNewBlog(newBlog);
     }
 
+    @Override
+    @RemoveRedisCache(keyPattern = "blog*")
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBlog(Long id) {
+        Blog blog = this.getById(id);
+        tagMapper.deleteBlogTagConnect(id, null);
+        contentMapper.deleteById(blog.getContentId());
+    }
+
     private void handleTagsNewBlog(BlogDTO newBlog) {
         List<Object> tagList = newBlog.getTagList();
 
@@ -343,12 +352,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         List<Long> newTagIds =
                 tagList.stream().map(tag -> (String) tag).filter(StringUtils::isNumeric).map(Long::valueOf).collect(Collectors.toList());
         List<Tag> oldTags = tagMapper.findTagsByBlogId(blogDTO.getBlogId());
-        // 过滤出不存在的id，就是需要删除的tag关系了
+        List<Long> oldTagIds = oldTags.stream().map(Tag::getTagId).collect(Collectors.toList());
+        // 旧id中过滤出不存在的新id，就是需要删除的tag关系了
         List<Long> deleteTagIds =
-                oldTags.stream().map(Tag::getTagId).filter(oldId -> !newTagIds.contains(oldId)).collect(Collectors.toList());
+                oldTagIds.stream().filter(oldId -> !newTagIds.contains(oldId)).collect(Collectors.toList());
         if (!deleteTagIds.isEmpty()) {
             tagMapper.deleteBlogTagConnect(blogDTO.getBlogId(), deleteTagIds);
         }
+        // 新id中过滤出不存在的旧id，就是需要新增的tag关系
+        List<Long> addTagIds =
+                newTagIds.stream().filter(newId -> !oldTagIds.contains(newId)).collect(Collectors.toList());
 
         List<String> newTagNames =
                 tagList.stream().map(tag -> (String) tag).filter(tag -> !StringUtils.isNumeric(tag)).collect(Collectors.toList());
@@ -364,7 +377,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             }).collect(Collectors.toList());
             tagsService.saveBatch(newTags);
             List<Long> newIds = newTags.stream().map(Tag::getTagId).collect(Collectors.toList());
-            tagMapper.insertBlogTag(blogDTO.getBlogId(), newIds);
+            addTagIds.addAll(newIds);
+        }
+        if (!addTagIds.isEmpty()) {
+            tagMapper.insertBlogTag(blogDTO.getBlogId(), addTagIds);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.touki.blog.controller.admin;
 
-import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.dto.BlogDTO;
 import com.touki.blog.model.entity.Category;
@@ -14,7 +13,6 @@ import com.touki.blog.service.BlogService;
 import com.touki.blog.service.CategoryService;
 import com.touki.blog.service.TagsService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -65,10 +63,8 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/delete")
-    @RemoveRedisCache(keyPattern = "blog*")
-    @Transactional(rollbackFor = Exception.class)
     public Result deleteBlog(Long id) {
-        blogService.removeById(id);
+        blogService.deleteBlog(id);
         return Result.success();
     }
 

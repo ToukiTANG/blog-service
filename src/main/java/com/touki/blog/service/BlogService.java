@@ -128,4 +128,11 @@ public interface BlogService extends IService<Blog> {
      * @param newBlog BlogDTO
      */
     void saveBlog(BlogDTO newBlog);
+
+    /**
+     * 删除文章
+     *
+     * @param id 文章id
+     */
+    void deleteBlog(Long id);
 }
