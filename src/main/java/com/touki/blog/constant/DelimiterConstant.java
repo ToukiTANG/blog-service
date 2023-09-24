@@ -6,4 +6,5 @@ package com.touki.blog.constant;
 public abstract class DelimiterConstant {
     public static final String SPACE = " ";
     public static final String COMMA = ",";
+    public static final String DOT = ".";
 }

@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: BlogService
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 15MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
