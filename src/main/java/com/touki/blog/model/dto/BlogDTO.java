@@ -10,7 +10,7 @@ import java.util.List;
  * @author Touki
  */
 @Data
-public class BlogUpdate {
+public class BlogDTO {
     private Long blogId;
 
     private String title;

@@ -2,7 +2,7 @@ package com.touki.blog.controller.admin;
 
 import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.exception.MyException;
-import com.touki.blog.model.dto.BlogUpdate;
+import com.touki.blog.model.dto.BlogDTO;
 import com.touki.blog.model.entity.Category;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.query.AdminBlogQuery;
@@ -80,8 +80,15 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/update")
-    public Result updateBlog(@RequestBody BlogUpdate blogUpdate) throws MyException {
-        blogService.updateBlog(blogUpdate);
+    public Result updateBlog(@RequestBody BlogDTO blogDTO) throws MyException {
+        blogService.updateBlog(blogDTO);
+        return Result.success();
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/blog/save")
+    public Result saveBlog(@RequestBody BlogDTO newBlog) {
+        blogService.saveBlog(newBlog);
         return Result.success();
     }
 }

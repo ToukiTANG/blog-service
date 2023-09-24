@@ -2,7 +2,7 @@ package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.touki.blog.exception.MyException;
-import com.touki.blog.model.dto.BlogUpdate;
+import com.touki.blog.model.dto.BlogDTO;
 import com.touki.blog.model.entity.Blog;
 import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
@@ -118,7 +118,14 @@ public interface BlogService extends IService<Blog> {
     /**
      * 更新文章
      *
-     * @param blogUpdate BlogUpdate
+     * @param blogDTO BlogDTO
      */
-    void updateBlog(BlogUpdate blogUpdate) throws MyException;
+    void updateBlog(BlogDTO blogDTO) throws MyException;
+
+    /**
+     * 新建文章
+     *
+     * @param newBlog BlogDTO
+     */
+    void saveBlog(BlogDTO newBlog);
 }

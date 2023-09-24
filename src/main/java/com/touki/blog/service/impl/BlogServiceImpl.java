@@ -8,10 +8,12 @@ import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
+import com.touki.blog.mapper.ContentMapper;
 import com.touki.blog.mapper.TagMapper;
-import com.touki.blog.model.dto.BlogUpdate;
+import com.touki.blog.model.dto.BlogDTO;
 import com.touki.blog.model.entity.Blog;
 import com.touki.blog.model.entity.Category;
+import com.touki.blog.model.entity.Content;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.query.AdminBlogQuery;
 import com.touki.blog.model.vo.*;
@@ -37,14 +39,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     private final CategoryMapper categoryMapper;
     private final TagsService tagsService;
     private final TagMapper tagMapper;
+    private final ContentMapper contentMapper;
 
     public BlogServiceImpl(BlogMapper blogMapper, RedisService redisService, CategoryMapper categoryMapper,
-                           TagsService tagsService, TagMapper tagMapper) {
+                           TagsService tagsService, TagMapper tagMapper, ContentMapper contentMapper) {
         this.blogMapper = blogMapper;
         this.redisService = redisService;
         this.categoryMapper = categoryMapper;
         this.tagsService = tagsService;
         this.tagMapper = tagMapper;
+        this.contentMapper = contentMapper;
     }
 
     /**
@@ -274,50 +278,100 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     @RemoveRedisCache(keyPattern = "blog*")
     @Transactional(rollbackFor = Exception.class)
-    public void updateBlog(BlogUpdate blogUpdate) {
+    public void updateBlog(BlogDTO blogDTO) {
         // 判断分类情况
-        handleCategory(blogUpdate);
+        handleCategory(blogDTO);
         // 判断标签情况
-        handleTags(blogUpdate);
+        handleTags(blogDTO);
         Blog blog = new Blog();
-        BeanUtils.copyProperties(blogUpdate, blog);
+        BeanUtils.copyProperties(blogDTO, blog);
         blog.setUpdateTime(new Date());
         this.updateById(blog);
     }
 
-    private void handleTags(BlogUpdate blogUpdate) {
-        List<Object> tagList = blogUpdate.getTagList();
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(keyPattern = "blog*")
+    public void saveBlog(BlogDTO newBlog) {
+        // 判断分类情况
+        handleCategory(newBlog);
+        // 处理正文存储
+        ContentInfo contentInfo = newBlog.getContent();
+        Content content = new Content();
+        BeanUtils.copyProperties(contentInfo, content);
+        contentMapper.insert(content);
+
+        Blog blog = new Blog();
+        BeanUtils.copyProperties(newBlog, blog);
+        blog.setContentId(content.getContentId());
+        Date date = new Date();
+        blog.setCreateTime(date);
+        blog.setUpdateTime(date);
+        this.save(blog);
+        // 判断标签情况，因为newBlog是没有blogId的，所以需要先保存文章，再设置一下
+        newBlog.setBlogId(blog.getBlogId());
+        handleTagsNewBlog(newBlog);
+    }
+
+    private void handleTagsNewBlog(BlogDTO newBlog) {
+        List<Object> tagList = newBlog.getTagList();
+
+        List<Long> tagIds =
+                tagList.stream().map(tag -> (String) tag).filter(StringUtils::isNumeric).map(Long::valueOf).collect(Collectors.toList());
+        List<String> newTagNames =
+                tagList.stream().map(tag -> (String) tag).filter(tag -> !StringUtils.isNumeric(tag)).collect(Collectors.toList());
+        Date date = new Date();
+        if (!newTagNames.isEmpty()) {
+            List<Tag> newTags = newTagNames.stream().map(tagName -> {
+                Tag tag = new Tag();
+                tag.setTagName(tagName);
+                tag.setDescription("");
+                tag.setCreateTime(date);
+                tag.setUpdateTime(date);
+                return tag;
+            }).collect(Collectors.toList());
+            tagsService.saveBatch(newTags);
+            List<Long> newIds = newTags.stream().map(Tag::getTagId).collect(Collectors.toList());
+            tagIds.addAll(newIds);
+        }
+        tagMapper.insertBlogTag(newBlog.getBlogId(), tagIds);
+    }
+
+    private void handleTags(BlogDTO blogDTO) {
+        List<Object> tagList = blogDTO.getTagList();
 
         List<Long> newTagIds =
                 tagList.stream().map(tag -> (String) tag).filter(StringUtils::isNumeric).map(Long::valueOf).collect(Collectors.toList());
-        List<Tag> oldTags = tagMapper.findTagsByBlogId(blogUpdate.getBlogId());
+        List<Tag> oldTags = tagMapper.findTagsByBlogId(blogDTO.getBlogId());
         // 过滤出不存在的id，就是需要删除的tag关系了
         List<Long> deleteTagIds =
                 oldTags.stream().map(Tag::getTagId).filter(oldId -> !newTagIds.contains(oldId)).collect(Collectors.toList());
         if (!deleteTagIds.isEmpty()) {
-            tagMapper.deleteBlogTagConnect(blogUpdate.getBlogId(), deleteTagIds);
+            tagMapper.deleteBlogTagConnect(blogDTO.getBlogId(), deleteTagIds);
         }
 
         List<String> newTagNames =
                 tagList.stream().map(tag -> (String) tag).filter(tag -> !StringUtils.isNumeric(tag)).collect(Collectors.toList());
         Date date = new Date();
-        List<Tag> newTags = newTagNames.stream().map(tagName -> {
-            Tag tag = new Tag();
-            tag.setTagName(tagName);
-            tag.setDescription("");
-            tag.setCreateTime(date);
-            tag.setUpdateTime(date);
-            return tag;
-        }).collect(Collectors.toList());
-        tagsService.saveBatch(newTags);
-        List<Long> newIds = newTags.stream().map(Tag::getTagId).collect(Collectors.toList());
-        tagMapper.insertBlogTag(blogUpdate.getBlogId(), newIds);
+        if (!newTagNames.isEmpty()) {
+            List<Tag> newTags = newTagNames.stream().map(tagName -> {
+                Tag tag = new Tag();
+                tag.setTagName(tagName);
+                tag.setDescription("");
+                tag.setCreateTime(date);
+                tag.setUpdateTime(date);
+                return tag;
+            }).collect(Collectors.toList());
+            tagsService.saveBatch(newTags);
+            List<Long> newIds = newTags.stream().map(Tag::getTagId).collect(Collectors.toList());
+            tagMapper.insertBlogTag(blogDTO.getBlogId(), newIds);
+        }
     }
 
-    private void handleCategory(BlogUpdate blogUpdate) {
-        String cate = (String) blogUpdate.getCate();
+    private void handleCategory(BlogDTO blogDTO) {
+        String cate = (String) blogDTO.getCate();
         if (StringUtils.isNumeric(cate)) {
-            blogUpdate.setCategoryId(Long.valueOf(cate));
+            blogDTO.setCategoryId(Long.valueOf(cate));
         } else {
             Category newCategory = new Category();
             newCategory.setCategoryName(cate);
@@ -326,7 +380,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             newCategory.setCreateTime(date);
             newCategory.setUpdateTime(date);
             categoryMapper.insert(newCategory);
-            blogUpdate.setCategoryId(newCategory.getCategoryId());
+            blogDTO.setCategoryId(newCategory.getCategoryId());
         }
     }
 
