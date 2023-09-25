@@ -1,6 +1,5 @@
-package com.touki.blog.model.entity;
+package com.touki.blog.model.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,15 +8,11 @@ import java.util.Date;
  * @author Touki
  */
 @Data
-public class Moment {
-    @TableId
+public class MomentUpdate {
     private Long momentId;
-
     private String content;
-
-    private Date createTime;
-
     private Integer likes;
-
     private Boolean published;
+    private Date createTime;
+    private Date updateTime = new Date();
 }
