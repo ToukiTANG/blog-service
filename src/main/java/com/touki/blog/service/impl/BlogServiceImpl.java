@@ -334,7 +334,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             List<Tag> newTags = newTagNames.stream().map(tagName -> {
                 Tag tag = new Tag();
                 tag.setTagName(tagName);
-                tag.setDescription("");
                 tag.setCreateTime(date);
                 tag.setUpdateTime(date);
                 return tag;
@@ -370,7 +369,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
             List<Tag> newTags = newTagNames.stream().map(tagName -> {
                 Tag tag = new Tag();
                 tag.setTagName(tagName);
-                tag.setDescription("");
                 tag.setCreateTime(date);
                 tag.setUpdateTime(date);
                 return tag;
@@ -391,7 +389,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         } else {
             Category newCategory = new Category();
             newCategory.setCategoryName(cate);
-            newCategory.setDescription("");
             Date date = new Date();
             newCategory.setCreateTime(date);
             newCategory.setUpdateTime(date);

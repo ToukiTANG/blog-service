@@ -3,7 +3,7 @@ package com.touki.blog.controller.admin;
 import com.touki.blog.model.dto.MomentUpdate;
 import com.touki.blog.model.dto.NewMoment;
 import com.touki.blog.model.entity.Moment;
-import com.touki.blog.model.query.AdminMomentQuery;
+import com.touki.blog.model.query.SimpleQuery;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.MomentService;
@@ -31,7 +31,7 @@ public class AdminMomentController {
     }
 
     @GetMapping("/list")
-    public Result momentList(AdminMomentQuery query) {
+    public Result momentList(SimpleQuery query) {
         PageResult<Moment> momentPageResult = momentService.adminMomentPage(query.getPageNum(), query.getPageSize());
         return Result.data(momentPageResult);
     }

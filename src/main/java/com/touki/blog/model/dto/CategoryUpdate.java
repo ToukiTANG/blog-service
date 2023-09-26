@@ -1,6 +1,5 @@
-package com.touki.blog.model.entity;
+package com.touki.blog.model.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,8 +8,7 @@ import java.util.Date;
  * @author Touki
  */
 @Data
-public class Category {
-    @TableId
+public class CategoryUpdate {
     private Long categoryId;
     private String categoryName;
     private Date createTime;

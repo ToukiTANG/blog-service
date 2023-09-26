@@ -13,7 +13,6 @@ public class Tag {
     @TableId
     private Long tagId;
     private String tagName;
-    private String description;
     private Date createTime;
     private Date updateTime;
 }

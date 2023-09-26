@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AdminMomentQuery extends BaseQuery {
+public class SimpleQuery extends BaseQuery {
 }
