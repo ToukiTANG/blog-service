@@ -28,4 +28,9 @@
                  left join blog_tag bt on t.tag_id = bt.tag_id
         where bt.blog_id = #{blogId}
     </select>
+    <select id="blogIds" resultType="java.lang.Long">
+        select blog_id
+        from blog_tag
+        where tag_id = #{tagId}
+    </select>
 </mapper>

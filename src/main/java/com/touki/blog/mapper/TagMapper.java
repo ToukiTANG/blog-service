@@ -34,4 +34,12 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param newTagIds 标签id集合
      */
     void insertBlogTag(Long blogId, List<Long> newTagIds);
+
+    /**
+     * 标签下的文章id集合
+     *
+     * @param tagId 标签id
+     * @return List<Long>
+     */
+    List<Long> blogIds(Long tagId);
 }
