@@ -9,4 +9,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AboutMapper extends BaseMapper<About> {
+    /**
+     * 更新about
+     *
+     * @param key   nameEn
+     * @param value value
+     */
+    void updateAbout(String key, Object value);
 }

@@ -15,4 +15,18 @@ public interface AboutService extends IService<About> {
      * @return: java.util.Map<java.lang.String, java.lang.Object>
      */
     Map<String, Object> getAboutInfo();
+
+    /**
+     * 后台获取about
+     *
+     * @return Map<String, Object>
+     */
+    Map<String, Object> getAdminAbout();
+
+    /**
+     * 更新about
+     *
+     * @param map 参数map
+     */
+    void updateAbout(Map<String, Object> map);
 }
