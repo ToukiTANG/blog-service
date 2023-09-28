@@ -88,4 +88,12 @@ public interface BlogMapper extends BaseMapper<Blog> {
      * @return Page<BlogInfo>
      */
     Page<BlogInfo> adminBlogs(Page<BlogInfo> blogPage, AdminBlogQuery query);
+
+    /**
+     * 查询分类下是否有文章
+     *
+     * @param categoryId 分类id
+     * @return Blog
+     */
+    Blog existBlogInCategory(Long categoryId);
 }

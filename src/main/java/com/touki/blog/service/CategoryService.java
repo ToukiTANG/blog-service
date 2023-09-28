@@ -29,7 +29,7 @@ public interface CategoryService extends IService<Category> {
     /**
      * 删除分类
      *
-     * @param id 分类id
+     * @param categoryId 分类id
      */
-    void deleteCategory(Long id) throws MyException;
+    void deleteCategory(Long categoryId) throws MyException;
 }

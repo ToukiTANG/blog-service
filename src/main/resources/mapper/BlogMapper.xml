@@ -201,4 +201,10 @@
         </where>
         order by b.create_time desc
     </select>
+    <select id="existBlogInCategory" resultType="com.touki.blog.model.entity.Blog">
+        select *
+        from blog
+        where category_id = #{categoryId}
+        limit 1
+    </select>
 </mapper>

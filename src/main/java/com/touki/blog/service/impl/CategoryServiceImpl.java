@@ -1,6 +1,5 @@
 package com.touki.blog.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.constant.RespCode;
@@ -49,13 +48,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteCategory(Long id) throws MyException {
-        LambdaQueryWrapper<Blog> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Blog::getCategoryId, id);
-        Blog blog = blogMapper.selectOne(queryWrapper);
+    public void deleteCategory(Long categoryId) throws MyException {
+        Blog blog = blogMapper.existBlogInCategory(categoryId);
         if (blog != null) {
             throw new MyException(RespCode.PARAMETER_ERROR, "该分类下还有文章，不允许删除！");
         }
-        this.removeById(id);
+        this.removeById(categoryId);
     }
 }

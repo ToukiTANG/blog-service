@@ -320,6 +320,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         Blog blog = this.getById(id);
         tagMapper.deleteBlogTagConnect(id, null);
         contentMapper.deleteById(blog.getContentId());
+        this.removeById(id);
     }
 
     private void handleTagsNewBlog(BlogDTO newBlog) {
