@@ -37,8 +37,8 @@ public class AdminTagController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/delete")
-    public Result deleteTag(Long tagId) throws MyException {
-        tagsService.deleteTag(tagId);
+    public Result deleteTag(Long id) throws MyException {
+        tagsService.deleteTag(id);
         return Result.success();
     }
 
