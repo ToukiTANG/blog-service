@@ -12,6 +12,6 @@ public abstract class RedisKeyConstant {
     public static final String CATEGORY_BLOG_INFO = "blog_category_info::";
     public static final String TAG_BLOG_INFO = "blog_tag_info::";
     public static final String SITE_SETTING_INFO = "site_setting_info";
-    public static final String MOMENT = "moment";
     public static final String BLOG_VIEWS = "views";
+    public static final String UPYUN_SETTING = "upyun_setting";
 }
