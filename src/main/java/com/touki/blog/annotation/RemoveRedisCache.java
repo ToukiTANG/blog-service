@@ -15,5 +15,5 @@ public @interface RemoveRedisCache {
 
     String key() default "";
 
-    String[] keys() default "";
+    String[] keys() default {};
 }

@@ -3,6 +3,7 @@ package com.touki.blog.aspect;
 import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -42,17 +43,19 @@ public class RemoveRedisCacheAspect {
         String[] keys = annotation.keys();
         try {
             Object proceed = pjp.proceed();
-            if (!keyPattern.isEmpty()) {
+            if (!StringUtils.isBlank(keyPattern)) {
                 redisService.removeKeyPattern(keyPattern);
+                log.info("删除redis缓存成功，keyPattern：{}执行方法：{}", keyPattern,
+                        signature.getDeclaringTypeName() + ":" + method.getName());
             }
-            if (!key.isEmpty()) {
+            if (!StringUtils.isBlank(key)) {
                 redisService.removeKey(key);
+                log.info("删除redis缓存成功，key：{}执行方法：{}", key, signature.getDeclaringTypeName() + ":" + method.getName());
             }
             if (keys.length != 0) {
                 redisService.removeKey(keys);
+                log.info("删除redis缓存成功，keys：{}执行方法：{}", keys, signature.getDeclaringTypeName() + ":" + method.getName());
             }
-            log.info("删除redis缓存成功，keyPattern：{}，key：{}，keys：{}，执行方法：{}", keyPattern, key, keys,
-                    signature.getDeclaringTypeName() + ":" + method.getName());
             return proceed;
         } catch (Throwable e) {
             throw new RuntimeException(e);
