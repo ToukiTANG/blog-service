@@ -63,3 +63,4 @@ replay_pid*
 # IntelliJ project files
 out
 gen
+log
