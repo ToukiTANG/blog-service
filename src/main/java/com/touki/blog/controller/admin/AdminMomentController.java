@@ -55,4 +55,11 @@ public class AdminMomentController {
         momentService.updateMoment(momentUpdate);
         return Result.success();
     }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/published")
+    public Result publishOrNot(Long momentId, Boolean published) {
+        momentService.publishOrNot(momentId, published);
+        return Result.success();
+    }
 }

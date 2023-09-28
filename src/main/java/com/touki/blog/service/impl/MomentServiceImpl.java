@@ -1,6 +1,7 @@
 package com.touki.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.mapper.MomentMapper;
@@ -9,7 +10,6 @@ import com.touki.blog.model.dto.NewMoment;
 import com.touki.blog.model.entity.Moment;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.service.MomentService;
-import com.touki.blog.service.RedisService;
 import com.touki.blog.util.markdown.MarkdownUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> implements MomentService {
     private final MomentMapper momentMapper;
-    private final RedisService redisService;
 
-    public MomentServiceImpl(MomentMapper momentMapper, RedisService redisService) {
+    public MomentServiceImpl(MomentMapper momentMapper) {
         this.momentMapper = momentMapper;
-        this.redisService = redisService;
     }
 
     /**
@@ -86,5 +84,13 @@ public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> impleme
         Moment moment = new Moment();
         BeanUtils.copyProperties(momentUpdate, moment);
         this.updateById(moment);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void publishOrNot(Long momentId, Boolean published) {
+        LambdaUpdateWrapper<Moment> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Moment::getMomentId, momentId).set(Moment::getPublished, published);
+        this.update(updateWrapper);
     }
 }

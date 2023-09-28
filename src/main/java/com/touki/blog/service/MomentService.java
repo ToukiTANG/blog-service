@@ -48,4 +48,12 @@ public interface MomentService extends IService<Moment> {
      * @param momentUpdate MomentUpdate
      */
     void updateMoment(MomentUpdate momentUpdate);
+
+    /**
+     * 更改发布状态
+     *
+     * @param momentId  动态id
+     * @param published 发布状态
+     */
+    void publishOrNot(Long momentId, Boolean published);
 }
