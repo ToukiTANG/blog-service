@@ -64,3 +64,4 @@ replay_pid*
 out
 gen
 log
+resources/application-prod.yml
