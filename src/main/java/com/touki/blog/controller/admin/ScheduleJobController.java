@@ -43,10 +43,16 @@ public class ScheduleJobController {
         return Result.data(jobPageResult);
     }
 
-    @PreAuthorize("hasAnyRole('admin')")
     @GetMapping("/job/logs")
     public Result jobLogs(JobLogQuery query) {
         PageResult<ScheduleJobLog> logs = jobService.jobLogs(query);
         return Result.data(logs);
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @PostMapping("/job/deleteLog")
+    public Result deleteJobLog(Long logId) {
+        jobService.deleteJobLog(logId);
+        return Result.success();
     }
 }

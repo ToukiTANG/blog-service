@@ -85,7 +85,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         String[] dates = StringUtils.split(query.getDate(), DelimiterConstant.COMMA);
         String startTime = null;
         String endTime = null;
-        if (dates.length == 2) {
+        if (dates != null && dates.length == 2) {
             startTime = dates[0];
             endTime = dates[1];
         }
@@ -103,5 +103,11 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobMapper, Sched
         pageResult.setTotal((int) logPage.getTotal());
         pageResult.setDataList(logPage.getRecords());
         return pageResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteJobLog(Long logId) {
+        logMapper.deleteById(logId);
     }
 }

@@ -41,4 +41,11 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
      * @return PageResult<ScheduleJobLog>
      */
     PageResult<ScheduleJobLog> jobLogs(JobLogQuery query);
+
+    /**
+     * 删除定时任务日志
+     *
+     * @param logId 定时任务日志
+     */
+    void deleteJobLog(Long logId);
 }
