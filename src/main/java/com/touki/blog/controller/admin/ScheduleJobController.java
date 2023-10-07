@@ -1,6 +1,8 @@
 package com.touki.blog.controller.admin;
 
 import com.touki.blog.model.dto.NewScheduleJob;
+import com.touki.blog.model.entity.ScheduleJobLog;
+import com.touki.blog.model.query.JobLogQuery;
 import com.touki.blog.model.query.JobQuery;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.model.vo.Result;
@@ -39,5 +41,12 @@ public class ScheduleJobController {
     public Result jobs(JobQuery query) {
         PageResult<ScheduleJob> jobPageResult = jobService.jobs(query);
         return Result.data(jobPageResult);
+    }
+
+    @PreAuthorize("hasAnyRole('admin')")
+    @GetMapping("/job/logs")
+    public Result jobLogs(JobLogQuery query) {
+        PageResult<ScheduleJobLog> logs = jobService.jobLogs(query);
+        return Result.data(logs);
     }
 }

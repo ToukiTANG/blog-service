@@ -4,8 +4,8 @@ import com.touki.blog.model.entity.ScheduleJobLog;
 import com.touki.blog.service.ScheduleJobLogService;
 import com.touki.blog.service.impl.ScheduleJobLogServiceImpl;
 import com.touki.blog.util.SpringContextUtil;
+import com.touki.blog.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
@@ -63,7 +63,7 @@ public class ScheduleJobExecutor extends QuartzJobBean {
             long executeTime = System.currentTimeMillis() - startTime;
             jobLog.setTimeConsumed((int) executeTime);
             jobLog.setStatus(false);
-            jobLog.setErrorMsg(StringUtils.substring(e.toString(), 0, 2000));
+            jobLog.setErrorMsg(StringUtil.getStackTrace(e));
             log.info("任务执行失败，任务id：{}", scheduleJob.getJobId());
             throw new RuntimeException(e);
         } finally {
