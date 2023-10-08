@@ -1,5 +1,7 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.RemoveRedisCache;
+import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.dto.NewCategory;
 import com.touki.blog.model.entity.Category;
@@ -47,6 +49,7 @@ public class AdminCategoryController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/update")
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     @Transactional(rollbackFor = Exception.class)
     public Result updateCategory(Category category) {
         category.setUpdateTime(new Date());

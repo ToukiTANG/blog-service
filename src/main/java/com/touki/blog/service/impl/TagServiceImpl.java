@@ -2,6 +2,8 @@ package com.touki.blog.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.touki.blog.annotation.RemoveRedisCache;
+import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.constant.RespCode;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.mapper.TagMapper;
@@ -42,6 +44,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagsS
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     public void saveTag(NewTag newTag) {
         Tag tag = new Tag();
         BeanUtils.copyProperties(newTag, tag);
@@ -50,6 +53,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagsS
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     public void deleteTag(Long tagId) throws MyException {
         List<Long> blogIds = tagMapper.blogIds(tagId);
         if (!CollectionUtils.isEmpty(blogIds)) {
@@ -60,6 +64,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagsS
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     public void updateTag(Tag tag) {
         tag.setUpdateTime(new Date());
         this.updateById(tag);

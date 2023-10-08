@@ -2,6 +2,8 @@ package com.touki.blog.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.touki.blog.annotation.RemoveRedisCache;
+import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.constant.RespCode;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.mapper.BlogMapper;
@@ -40,6 +42,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     public void saveCategory(NewCategory newCategory) {
         Category category = new Category();
         BeanUtils.copyProperties(newCategory, category);
@@ -48,6 +51,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     public void deleteCategory(Long categoryId) throws MyException {
         Blog blog = blogMapper.existBlogInCategory(categoryId);
         if (blog != null) {
