@@ -30,17 +30,19 @@ public class Task {
     @Transactional(rollbackFor = Exception.class)
     public void syncRedisViews2Database() {
         Map<Object, Object> hashMap = redisService.getHashMap(RedisKeyConstant.BLOG_VIEWS);
-        Set<Object> keySet = hashMap.keySet();
-        List<Object> values = redisService.multiGet(RedisKeyConstant.BLOG_VIEWS, keySet);
-        List<Long> ids = keySet.stream().map(o -> Long.valueOf((String) o)).collect(Collectors.toList());
-        List<Integer> views = values.stream().map(v -> (Integer) v).collect(Collectors.toList());
-        ArrayList<Blog> blogs = new ArrayList<>();
-        for (int i = 0; i < ids.size(); i++) {
-            Blog blog = new Blog();
-            blog.setBlogId(ids.get(i));
-            blog.setViews(views.get(i));
-            blogs.add(blog);
+        if (!hashMap.isEmpty()) {
+            Set<Object> keySet = hashMap.keySet();
+            List<Object> values = redisService.multiGet(RedisKeyConstant.BLOG_VIEWS, keySet);
+            List<Long> ids = keySet.stream().map(o -> Long.valueOf((String) o)).collect(Collectors.toList());
+            List<Integer> views = values.stream().map(v -> (Integer) v).collect(Collectors.toList());
+            ArrayList<Blog> blogs = new ArrayList<>();
+            for (int i = 0; i < ids.size(); i++) {
+                Blog blog = new Blog();
+                blog.setBlogId(ids.get(i));
+                blog.setViews(views.get(i));
+                blogs.add(blog);
+            }
+            blogService.updateBatchById(blogs);
         }
-        blogService.updateBatchById(blogs);
     }
 }
