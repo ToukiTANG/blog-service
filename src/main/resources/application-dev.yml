@@ -52,3 +52,6 @@ mybatis-plus:
 logging:
   level:
     sql: debug
+
+touki:
+  secret-key: ${secretKey}

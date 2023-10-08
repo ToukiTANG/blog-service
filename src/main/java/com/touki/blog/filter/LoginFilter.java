@@ -27,6 +27,12 @@ import java.io.IOException;
  * @author Touki
  */
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
+    private final JwtUtil jwtUtil;
+
+    public LoginFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (!"POST".equals(request.getMethod())) {
@@ -50,7 +56,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException {
         AuthUser authUser = (AuthUser) authResult.getPrincipal();
-        String accessToken = JwtUtil.createAccessToken(authUser);
+        String accessToken = jwtUtil.createAccessToken(authUser);
         UserVo user = new UserVo();
         BeanUtils.copyProperties(authUser, user);
         LoginVo loginVo = new LoginVo(accessToken, user);

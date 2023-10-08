@@ -6,6 +6,7 @@ import com.touki.blog.filter.TokenFilter;
 import com.touki.blog.handler.MyAccessDeniedHandler;
 import com.touki.blog.handler.MyAuthenticationEntryPoint;
 import com.touki.blog.service.impl.SysUserServiceImpl;
+import com.touki.blog.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,12 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final JwtUtil jwtUtil;
     private final SysUserServiceImpl sysUserService;
     private final MyAccessDeniedHandler accessDeniedHandler;
     private final MyAuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(SysUserServiceImpl sysUserService, MyAccessDeniedHandler accessDeniedHandler,
+    public SecurityConfig(JwtUtil jwtUtil, SysUserServiceImpl sysUserService, MyAccessDeniedHandler accessDeniedHandler,
                           MyAuthenticationEntryPoint authenticationEntryPoint) {
+        this.jwtUtil = jwtUtil;
         this.sysUserService = sysUserService;
         this.accessDeniedHandler = accessDeniedHandler;
         this.authenticationEntryPoint = authenticationEntryPoint;
@@ -66,7 +69,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginFilter loginFilter(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter();
+        LoginFilter loginFilter = new LoginFilter(jwtUtil);
         loginFilter.setAuthenticationManager(authenticationManager(http));
         loginFilter.setFilterProcessesUrl(EndpointConstant.ADMIN_LOGIN);
         return loginFilter;
@@ -74,6 +77,6 @@ public class SecurityConfig {
 
     @Bean
     public TokenFilter tokenFilter() {
-        return new TokenFilter();
+        return new TokenFilter(jwtUtil);
     }
 }

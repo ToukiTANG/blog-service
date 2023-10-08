@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "description": "生成token时的密钥",
+      "name": "touki.secret-key",
+      "type": "java.lang.String"
+    }
+  ]
+}

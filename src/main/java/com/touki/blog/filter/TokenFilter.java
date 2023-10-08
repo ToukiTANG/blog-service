@@ -10,6 +10,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,10 +29,15 @@ import java.util.List;
  * @author Touki
  */
 public class TokenFilter extends OncePerRequestFilter {
+    private final JwtUtil jwtUtil;
+
+    public TokenFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().contains(EndpointConstant.ADMIN_LOGIN) || !request.getRequestURI().startsWith(
                 "/admin")) {
             filterChain.doFilter(request, response);
@@ -42,7 +48,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 String authorities;
                 try {
                     String token = StringUtils.split(header, DelimiterConstant.SPACE)[1];
-                    Claims claims = JwtUtil.parseJwt(token);
+                    Claims claims = jwtUtil.parseJwt(token);
                     username = claims.getSubject();
                     authorities = claims.get("authorities", String.class);
 
