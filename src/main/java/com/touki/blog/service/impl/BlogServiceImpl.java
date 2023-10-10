@@ -276,7 +276,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    @RemoveRedisCache(keyPattern = "blog*")
+    @RemoveRedisCache(keyPattern = "blog*", key = RedisKeyConstant.SITE_SETTING_INFO)
     @Transactional(rollbackFor = Exception.class)
     public void updateBlog(BlogDTO blogDTO) {
         // 判断分类情况
@@ -287,11 +287,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         BeanUtils.copyProperties(blogDTO, blog);
         blog.setUpdateTime(new Date());
         this.updateById(blog);
+        ContentInfo contentInfo = blogDTO.getContent();
+        Content content = new Content();
+        BeanUtils.copyProperties(contentInfo, content);
+        contentMapper.updateById(content);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @RemoveRedisCache(keyPattern = "blog*")
+    @RemoveRedisCache(keyPattern = "blog*", key = RedisKeyConstant.SITE_SETTING_INFO)
     public void saveBlog(BlogDTO newBlog) {
         // 判断分类情况
         handleCategory(newBlog);
@@ -314,7 +318,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
-    @RemoveRedisCache(keyPattern = "blog*")
+    @RemoveRedisCache(keyPattern = "blog*", key = RedisKeyConstant.SITE_SETTING_INFO)
     @Transactional(rollbackFor = Exception.class)
     public void deleteBlog(Long id) {
         Blog blog = this.getById(id);
