@@ -3,14 +3,11 @@ package com.touki.blog.util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.xdb.Searcher;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -21,17 +18,17 @@ import java.net.UnknownHostException;
 @Component
 public class IpAddressUtil {
     private static Searcher searcher;
-    private static Method method;
+    @Value("${spring.profiles.active}")
+    private String environment;
 
     @PostConstruct
     private void initIp2regionResource() throws Exception {
-        InputStream inputStream = new ClassPathResource("/ipdb/ip2region.xdb").getInputStream();
-        // 将 ip2region.db 转为 ByteArray
-        byte[] dbBinStr = FileCopyUtils.copyToByteArray(inputStream);
-        // 使用上述的 dbBinStr 创建一个完全基于内存的查询对象。
-        searcher = new Searcher(null, null, dbBinStr);
-        // 二进制方式初始化 DBSearcher，需要使用基于内存的查找算法 memorySearch
-        method = searcher.getClass().getMethod("search", String.class);
+
+        if ("dev".equals(environment)) {
+            searcher = Searcher.newWithFileOnly("src/main/resources/ipdb/ip2region.xdb");
+        } else {
+            searcher = Searcher.newWithFileOnly("/root/blog/ip2region.xdb");
+        }
     }
 
     public static String getIpAddress(HttpServletRequest request) {
@@ -70,15 +67,25 @@ public class IpAddressUtil {
 
     public static String getCityInfo(String ip) {
         try {
-            String ipInfo = (String) method.invoke(searcher, ip);
-            if (!StringUtils.isEmpty(ipInfo)) {
-                ipInfo = ipInfo.replace("|0", "");
-                ipInfo = ipInfo.replace("0|", "");
+            String region = searcher.search(ip);
+            if (region == null) {
+                return "未知属地";
             }
-            return ipInfo;
+            if (!StringUtils.isEmpty(region)) {
+                region = region.replace("|0", "");
+                region = region.replace("0|", "");
+            }
+            return region;
         } catch (Exception e) {
             log.error("getCityInfo exception:", e);
         }
-        return "";
+        return "未知属地";
+    }
+
+    public static void main(String[] args) throws Exception {
+        IpAddressUtil ipAddressUtil = new IpAddressUtil();
+        ipAddressUtil.initIp2regionResource();
+        String cityInfo = IpAddressUtil.getCityInfo("110.191.13.235");
+        System.out.println(cityInfo);
     }
 }
