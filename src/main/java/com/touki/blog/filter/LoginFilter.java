@@ -2,10 +2,13 @@ package com.touki.blog.filter;
 
 import com.touki.blog.constant.RespCode;
 import com.touki.blog.model.dto.AuthUser;
+import com.touki.blog.model.entity.LoginLog;
 import com.touki.blog.model.entity.SysUser;
 import com.touki.blog.model.vo.LoginVo;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.model.vo.UserVo;
+import com.touki.blog.service.LoginLogService;
+import com.touki.blog.util.IpAddressUtil;
 import com.touki.blog.util.JsonUtil;
 import com.touki.blog.util.JwtUtil;
 import com.touki.blog.util.NetworkUtil;
@@ -28,9 +31,12 @@ import java.io.IOException;
  */
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
+    private final LoginLogService loginLogService;
+    ThreadLocal<String> currentUsername = new ThreadLocal<>();
 
-    public LoginFilter(JwtUtil jwtUtil) {
+    public LoginFilter(JwtUtil jwtUtil, LoginLogService loginLogService) {
         this.jwtUtil = jwtUtil;
+        this.loginLogService = loginLogService;
     }
 
     @Override
@@ -41,6 +47,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             SysUser user = JsonUtil.readValue(request.getInputStream(), SysUser.class);
             if (user != null) {
+                currentUsername.set(user.getUsername());
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
                 setDetails(request, authenticationToken);
@@ -60,18 +67,35 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         UserVo user = new UserVo();
         BeanUtils.copyProperties(authUser, user);
         LoginVo loginVo = new LoginVo(accessToken, user);
+        LoginLog loginLog = handelLoginLog(request, true, "登陆成功");
+        loginLogService.saveLog(loginLog);
         NetworkUtil.setJsonResponse(response, Result.data(loginVo));
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException {
+        String msg;
         if (failed instanceof BadCredentialsException) {
-            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, "用户名或密码错误！"));
+            msg = "用户名或密码错误！";
+            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, msg));
         } else if (failed instanceof AccountStatusException) {
-            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, "用户已被禁用，请联系管理员！"));
+            msg = "用户已被禁用，请联系管理员！";
+            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, msg));
         } else {
-            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, "用户已被禁用，请联系管理员！"));
+            msg = "登录异常！";
+            NetworkUtil.setJsonResponse(response, Result.message(RespCode.AUTHENTICATE_FAIL, msg));
         }
+        LoginLog loginLog = handelLoginLog(request, false, msg);
+        loginLogService.saveLog(loginLog);
+    }
+
+    private LoginLog handelLoginLog(HttpServletRequest request, boolean status, String description) {
+        String username = currentUsername.get();
+        currentUsername.remove();
+        String ip = IpAddressUtil.getIpAddress(request);
+        String userAgent = request.getHeader("User-Agent");
+        return new LoginLog(username, ip, status, description, userAgent);
     }
 }

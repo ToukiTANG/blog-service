@@ -166,6 +166,18 @@
             <artifactId>hutool-crypto</artifactId>
             <version>5.8.22</version>
         </dependency>
+        <!-- ip2region -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <!-- 解析客户端操作系统、浏览器 -->
+        <dependency>
+            <groupId>nl.basjes.parse.useragent</groupId>
+            <artifactId>yauaa</artifactId>
+            <version>7.19.1</version>
+        </dependency>
     </dependencies>
 
     <profiles>
