@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.model.dto.NewScheduleJob;
 import com.touki.blog.model.entity.ScheduleJobLog;
 import com.touki.blog.model.query.JobLogQuery;
@@ -32,6 +33,7 @@ public class ScheduleJobController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/job/execute")
+    @OperationLogger("执行定时任务")
     public Result executeJob(@RequestParam Long jobId) {
         jobService.execute(jobId);
         return Result.success();
@@ -51,6 +53,7 @@ public class ScheduleJobController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/job/deleteLog")
+    @OperationLogger("删除定时任务日志")
     public Result deleteJobLog(Long logId) {
         jobService.deleteJobLog(logId);
         return Result.success();

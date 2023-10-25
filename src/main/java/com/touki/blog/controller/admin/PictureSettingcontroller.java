@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.model.entity.UpyunSetting;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.UpyunSettingService;
@@ -28,6 +29,7 @@ public class PictureSettingcontroller {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/upyunSetting/update")
+    @OperationLogger("更新又拍云设置")
     public Result updateUpyunSetting(@RequestBody UpyunSetting setting) {
         upyunSettingService.updateUpyunSetting(setting);
         return Result.success();

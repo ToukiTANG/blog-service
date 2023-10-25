@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.model.dto.SiteSettingsUpdate;
 import com.touki.blog.model.entity.SiteSetting;
 import com.touki.blog.model.vo.Result;
@@ -30,6 +31,7 @@ public class AdminSiteSettingController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/update")
+    @OperationLogger("更新网站信息")
     public Result updateSiteSettings(@RequestBody SiteSettingsUpdate siteSettingsUpdate) {
         siteSettingService.updateSiteSettings(siteSettingsUpdate);
         return Result.success();

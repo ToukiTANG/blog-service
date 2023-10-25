@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.dto.BlogDTO;
 import com.touki.blog.model.entity.Category;
@@ -56,6 +57,7 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/updateTop")
+    @OperationLogger("更新博客置顶状态")
     public Result updateTop(Long id, Boolean top) {
         blogService.updateTop(id, top);
         return Result.success();
@@ -63,6 +65,7 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/delete")
+    @OperationLogger("删除博客")
     public Result deleteBlog(Long id) {
         blogService.deleteBlog(id);
         return Result.success();
@@ -76,6 +79,7 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/update")
+    @OperationLogger("更新博客")
     public Result updateBlog(@RequestBody BlogDTO blogDTO) throws MyException {
         blogService.updateBlog(blogDTO);
         return Result.success();
@@ -83,6 +87,7 @@ public class AdminBlogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/blog/save")
+    @OperationLogger("新建博客")
     public Result saveBlog(@RequestBody BlogDTO newBlog) {
         blogService.saveBlog(newBlog);
         return Result.success();

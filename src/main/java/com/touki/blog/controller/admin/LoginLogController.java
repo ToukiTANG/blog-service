@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.model.entity.LoginLog;
 import com.touki.blog.model.query.LoginLogQuery;
 import com.touki.blog.model.vo.PageResult;
@@ -32,6 +33,7 @@ public class LoginLogController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/delete")
+    @OperationLogger("删除登录日志")
     @Transactional(rollbackFor = Exception.class)
     public Result deleteLoginLog(Long logId) {
         loginLogService.removeById(logId);

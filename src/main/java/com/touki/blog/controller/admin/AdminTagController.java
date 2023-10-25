@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.dto.NewTag;
 import com.touki.blog.model.entity.Tag;
@@ -30,6 +31,7 @@ public class AdminTagController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/save")
+    @OperationLogger("新建标签")
     public Result saveTag(@RequestBody NewTag newTag) {
         tagsService.saveTag(newTag);
         return Result.success();
@@ -37,6 +39,7 @@ public class AdminTagController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/delete")
+    @OperationLogger("删除标签")
     public Result deleteTag(Long id) throws MyException {
         tagsService.deleteTag(id);
         return Result.success();
@@ -44,6 +47,7 @@ public class AdminTagController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/update")
+    @OperationLogger("更新标签")
     public Result updateTag(Tag tag) {
         tagsService.updateTag(tag);
         return Result.success();

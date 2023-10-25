@@ -8,7 +8,6 @@ import com.touki.blog.util.IpAddressUtil;
 import com.touki.blog.util.JsonUtil;
 import com.touki.blog.util.JwtUtil;
 import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
  */
 @Aspect
 @Component
-@Slf4j
 public class OperationLoggerAspect {
     private final OperationLogService operationLogService;
 

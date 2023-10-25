@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.constant.RedisKeyConstant;
 import com.touki.blog.exception.MyException;
@@ -35,6 +36,7 @@ public class AdminCategoryController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/save")
+    @OperationLogger("新建分类")
     public Result saveCategory(@RequestBody NewCategory newCategory) {
         categoryService.saveCategory(newCategory);
         return Result.success();
@@ -42,6 +44,7 @@ public class AdminCategoryController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/delete")
+    @OperationLogger("删除分类")
     public Result deleteCategory(Long id) throws MyException {
         categoryService.deleteCategory(id);
         return Result.success();
@@ -49,6 +52,7 @@ public class AdminCategoryController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/update")
+    @OperationLogger("更新分类")
     @RemoveRedisCache(key = RedisKeyConstant.SITE_SETTING_INFO)
     @Transactional(rollbackFor = Exception.class)
     public Result updateCategory(Category category) {
