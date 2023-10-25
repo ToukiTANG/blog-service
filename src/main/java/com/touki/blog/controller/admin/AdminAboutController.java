@@ -1,5 +1,6 @@
 package com.touki.blog.controller.admin;
 
+import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.AboutService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +28,7 @@ public class AdminAboutController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/update")
+    @OperationLogger("更新关于我页面")
     public Result updateAbout(@RequestBody Map<String, Object> map) {
         aboutService.updateAbout(map);
         return Result.success();

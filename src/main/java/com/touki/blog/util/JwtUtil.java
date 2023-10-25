@@ -24,8 +24,13 @@ import java.util.stream.Collectors;
 @Configuration
 public class JwtUtil {
 
+    public static String secretKey;
+
     @Value("${touki.secret-key}")
-    public String secretKey;
+    public void setSecret(String sKey) {
+        secretKey = sKey;
+    }
+
     public static final SignatureAlgorithm ALGORITHM = SignatureAlgorithm.HS256;
     /**
      * ac_token2天过期
@@ -36,7 +41,7 @@ public class JwtUtil {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    public String createAccessToken(AuthUser authUser) {
+    public static String createAccessToken(AuthUser authUser) {
         String collect = extractAuthorities(authUser);
         return Jwts.builder().setSubject(String.valueOf(authUser.getUsername()))
                 .claim("authorities", collect)
@@ -46,12 +51,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    private String extractAuthorities(AuthUser authUser) {
+    private static String extractAuthorities(AuthUser authUser) {
         Collection<? extends GrantedAuthority> authorities = authUser.getAuthorities();
         return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(DelimiterConstant.COMMA));
     }
 
-    public Claims parseJwt(String jwtToken) {
+    public static Claims parseJwt(String jwtToken) {
         SecretKey secretKey = generalKey();
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -60,7 +65,7 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public SecretKey generalKey() {
+    public static SecretKey generalKey() {
         byte[] encodeKey = Base64.getDecoder().decode(secretKey);
         return new SecretKeySpec(encodeKey, 0, encodeKey.length, "HmacSHA256");
     }

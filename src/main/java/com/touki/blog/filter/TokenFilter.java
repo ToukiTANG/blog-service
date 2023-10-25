@@ -29,11 +29,6 @@ import java.util.List;
  * @author Touki
  */
 public class TokenFilter extends OncePerRequestFilter {
-    private final JwtUtil jwtUtil;
-
-    public TokenFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response,
@@ -48,7 +43,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 String authorities;
                 try {
                     String token = StringUtils.split(header, DelimiterConstant.SPACE)[1];
-                    Claims claims = jwtUtil.parseJwt(token);
+                    Claims claims = JwtUtil.parseJwt(token);
                     username = claims.getSubject();
                     authorities = claims.get("authorities", String.class);
 

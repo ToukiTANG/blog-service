@@ -7,7 +7,6 @@ import com.touki.blog.handler.MyAccessDeniedHandler;
 import com.touki.blog.handler.MyAuthenticationEntryPoint;
 import com.touki.blog.service.LoginLogService;
 import com.touki.blog.service.impl.SysUserServiceImpl;
-import com.touki.blog.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,16 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final JwtUtil jwtUtil;
     private final SysUserServiceImpl sysUserService;
     private final LoginLogService loginLogService;
     private final MyAccessDeniedHandler accessDeniedHandler;
     private final MyAuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(JwtUtil jwtUtil, SysUserServiceImpl sysUserService, LoginLogService loginLogService,
+    public SecurityConfig(SysUserServiceImpl sysUserService, LoginLogService loginLogService,
                           MyAccessDeniedHandler accessDeniedHandler,
                           MyAuthenticationEntryPoint authenticationEntryPoint) {
-        this.jwtUtil = jwtUtil;
         this.sysUserService = sysUserService;
         this.loginLogService = loginLogService;
         this.accessDeniedHandler = accessDeniedHandler;
@@ -73,7 +70,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginFilter loginFilter(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(jwtUtil, loginLogService);
+        LoginFilter loginFilter = new LoginFilter(loginLogService);
         loginFilter.setAuthenticationManager(authenticationManager(http));
         loginFilter.setFilterProcessesUrl(EndpointConstant.ADMIN_LOGIN);
         return loginFilter;
@@ -81,6 +78,6 @@ public class SecurityConfig {
 
     @Bean
     public TokenFilter tokenFilter() {
-        return new TokenFilter(jwtUtil);
+        return new TokenFilter();
     }
 }
