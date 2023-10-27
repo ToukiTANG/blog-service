@@ -125,4 +125,14 @@ public class RedisServiceImpl implements RedisService {
             redisTemplate.delete(keys);
         }
     }
+
+    @Override
+    public boolean hasValueInSet(String key, String value) {
+        return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, value));
+    }
+
+    @Override
+    public void saveValueToSet(String key, String value) {
+        redisTemplate.opsForSet().add(key, value);
+    }
 }

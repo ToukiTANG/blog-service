@@ -1,5 +1,7 @@
 package com.touki.blog.controller;
 
+import com.touki.blog.annotation.VisitLogger;
+import com.touki.blog.enums.VisitBehaviorEnum;
 import com.touki.blog.model.vo.Result;
 import com.touki.blog.service.AboutService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ public class AboutController {
     }
 
     @GetMapping
+    @VisitLogger(VisitBehaviorEnum.ABOUT)
     public Result getAboutInfo() {
         Map<String, Object> map = aboutService.getAboutInfo();
         return Result.data(map);

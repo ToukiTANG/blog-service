@@ -1,6 +1,8 @@
 package com.touki.blog.controller;
 
+import com.touki.blog.annotation.VisitLogger;
 import com.touki.blog.constant.SiteDataConstant;
+import com.touki.blog.enums.VisitBehaviorEnum;
 import com.touki.blog.model.entity.Category;
 import com.touki.blog.model.vo.BlogInfo;
 import com.touki.blog.model.vo.PageResult;
@@ -29,6 +31,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @VisitLogger(VisitBehaviorEnum.CATEGORY)
     public Result blogInfosByCategoryId(@RequestParam Long categoryId,
                                         @RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfosByCategoryId(categoryId, pageNum,

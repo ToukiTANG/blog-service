@@ -1,6 +1,8 @@
 package com.touki.blog.controller;
 
+import com.touki.blog.annotation.VisitLogger;
 import com.touki.blog.constant.SiteDataConstant;
+import com.touki.blog.enums.VisitBehaviorEnum;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.vo.BlogInfo;
 import com.touki.blog.model.vo.PageResult;
@@ -29,6 +31,7 @@ public class TagController {
     }
 
     @GetMapping
+    @VisitLogger(VisitBehaviorEnum.TAG)
     public Result blogInfosByTagId(@RequestParam Long tagId,
                                    @RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfosByTagId(tagId, pageNum,

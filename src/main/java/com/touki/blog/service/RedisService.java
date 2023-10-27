@@ -106,4 +106,21 @@ public interface RedisService {
      * @param keyPattern String
      */
     void removeKeyPattern(String keyPattern);
+
+    /**
+     * 检查身份标识set中是否存在标识
+     *
+     * @param key   key
+     * @param value value
+     * @return 是否存在
+     */
+    boolean hasValueInSet(String key, String value);
+
+    /**
+     * 保存到set中
+     *
+     * @param key   key
+     * @param value value
+     */
+    void saveValueToSet(String key, String value);
 }

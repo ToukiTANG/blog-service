@@ -1,6 +1,8 @@
 package com.touki.blog.controller;
 
+import com.touki.blog.annotation.VisitLogger;
 import com.touki.blog.constant.SiteDataConstant;
+import com.touki.blog.enums.VisitBehaviorEnum;
 import com.touki.blog.model.entity.Moment;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.model.vo.Result;
@@ -20,12 +22,14 @@ public class MomentController {
     }
 
     @GetMapping
+    @VisitLogger(VisitBehaviorEnum.MOMENT)
     public Result momentList(@RequestParam(defaultValue = "1") Integer pageNum) {
         PageResult<Moment> momentPageResult = momentService.momentPage(pageNum, SiteDataConstant.MOMENT_SIZE);
         return Result.data(momentPageResult);
     }
 
     @PostMapping("/like")
+    @VisitLogger(VisitBehaviorEnum.LIKE_MOMENT)
     public Result likeMoment(Long momentId) {
         momentService.likeMoment(momentId);
         return Result.success();

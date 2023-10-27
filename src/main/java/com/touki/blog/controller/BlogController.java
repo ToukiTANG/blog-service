@@ -1,7 +1,9 @@
 package com.touki.blog.controller;
 
+import com.touki.blog.annotation.VisitLogger;
 import com.touki.blog.constant.RespCode;
 import com.touki.blog.constant.SiteDataConstant;
+import com.touki.blog.enums.VisitBehaviorEnum;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.vo.*;
 import com.touki.blog.service.BlogService;
@@ -26,18 +28,21 @@ public class BlogController {
     }
 
     @GetMapping("/list")
+    @VisitLogger(VisitBehaviorEnum.INDEX)
     public Result blogList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         PageResult<BlogInfo> blogInfoPage = blogService.getBlogInfos(pageNum, SiteDataConstant.BLOG_HOME_SIZE);
         return Result.data(blogInfoPage);
     }
 
     @GetMapping
+    @VisitLogger(VisitBehaviorEnum.BLOG)
     public Result blogDetailById(@RequestParam Long blogId) {
         BlogDetail blogDetail = blogService.getBlogDetailById(blogId);
         return Result.data(blogDetail);
     }
 
     @GetMapping("/searchBlog")
+    @VisitLogger(VisitBehaviorEnum.SEARCH)
     public Result searchBlog(String queryString) throws MyException {
         String trimStr = queryString.trim();
         int strLen = trimStr.length();

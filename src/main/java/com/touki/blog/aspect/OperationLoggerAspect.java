@@ -4,6 +4,7 @@ import com.touki.blog.annotation.OperationLogger;
 import com.touki.blog.constant.DelimiterConstant;
 import com.touki.blog.model.entity.OperationLog;
 import com.touki.blog.service.OperationLogService;
+import com.touki.blog.util.AopUtil;
 import com.touki.blog.util.IpAddressUtil;
 import com.touki.blog.util.JsonUtil;
 import com.touki.blog.util.JwtUtil;
@@ -20,11 +21,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Touki
@@ -72,12 +70,7 @@ public class OperationLoggerAspect {
         Method method = signature.getMethod();
         OperationLogger operationLogger = method.getAnnotation(OperationLogger.class);
         String description = operationLogger.value();
-        String[] parameterNames = signature.getParameterNames();
-        List<String> paramList = Arrays.asList(parameterNames);
-        Object[] args = pjp.getArgs();
-        List<Object> argList = Arrays.asList(args);
-        Map<String, Object> map = paramList.stream().collect(Collectors.toMap(p -> p,
-                p -> argList.get(paramList.indexOf(p))));
+        Map<String, Object> map = AopUtil.getRequestParams(pjp);
 
         OperationLog operationLog = new OperationLog();
         operationLog.setUserAgent(userAgent);
