@@ -44,7 +44,7 @@ public interface BlogService extends IService<Blog> {
      * @param blogId: 文章id
      * @return: com.touki.blog.entity.vo.BlogDetail
      */
-    BlogDetail getBlogDetailById(Long blogId);
+    BlogDetail getBlogDetailById(Long blogId) throws MyException;
 
     /**
      * 通过分类id查询分页BlogInfo

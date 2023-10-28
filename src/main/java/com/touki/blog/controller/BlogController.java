@@ -36,7 +36,7 @@ public class BlogController {
 
     @GetMapping
     @VisitLogger(VisitBehaviorEnum.BLOG)
-    public Result blogDetailById(@RequestParam Long blogId) {
+    public Result blogDetailById(@RequestParam Long blogId) throws MyException {
         BlogDetail blogDetail = blogService.getBlogDetailById(blogId);
         return Result.data(blogDetail);
     }

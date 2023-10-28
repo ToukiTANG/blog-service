@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.annotation.RemoveRedisCache;
 import com.touki.blog.constant.RedisKeyConstant;
+import com.touki.blog.constant.RespCode;
+import com.touki.blog.exception.MyException;
 import com.touki.blog.mapper.BlogMapper;
 import com.touki.blog.mapper.CategoryMapper;
 import com.touki.blog.mapper.ContentMapper;
@@ -104,13 +106,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @return BlogDetail
      */
     @Override
-    public BlogDetail getBlogDetailById(Long blogId) {
+    public BlogDetail getBlogDetailById(Long blogId) throws MyException {
         BlogDetail blogDetail = (BlogDetail) redisService.getHash(RedisKeyConstant.BLOG_DETAIL, blogId);
         if (blogDetail != null) {
             setBlogViews(blogId, blogDetail);
             return blogDetail;
         }
         blogDetail = blogMapper.getBlogDetail(blogId);
+        if (blogDetail == null) {
+            throw new MyException(RespCode.PARAMETER_ERROR, "博客不存在！");
+        }
         ContentInfo content = blogDetail.getContent();
         String description = blogDetail.getDescription();
         blogDetail.setDescription(MarkdownUtil.markdownToHtmlExtensions(description));
