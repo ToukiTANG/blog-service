@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.touki.blog.constant.DelimiterConstant;
 import com.touki.blog.mapper.VisitorLogMapper;
 import com.touki.blog.model.dto.UserAgentDTO;
+import com.touki.blog.model.dto.VisitLogStatistic;
 import com.touki.blog.model.entity.VisitLog;
 import com.touki.blog.model.query.VisitLogQuery;
 import com.touki.blog.model.vo.PageResult;
@@ -15,6 +16,8 @@ import com.touki.blog.util.UserAgentUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author Touki
@@ -67,5 +70,10 @@ public class VisitorLogServiceImpl extends ServiceImpl<VisitorLogMapper, VisitLo
         pageResult.setTotal((int) logPage.getTotal());
         pageResult.setDataList(logPage.getRecords());
         return pageResult;
+    }
+
+    @Override
+    public List<VisitLogStatistic> visitLogStatisticYesterday() {
+        return this.baseMapper.visitLogStatisticYesterday();
     }
 }

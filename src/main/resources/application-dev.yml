@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 826474
-    url: jdbc:mysql://${mysql.host}:${mysql.port}/blog_schema?useUnicode=true&characterEncoding=UTF-8&serverTimeZone=Asia/Shanghai
+    url: jdbc:mysql://${mysql.host}:${mysql.port}/blog_schema?useUnicode=true&characterEncoding=UTF-8&serverTimeZone=Asia/Shanghai&allowMultiQueries=true
     druid:
       max-active: 20
       min-idle: 10

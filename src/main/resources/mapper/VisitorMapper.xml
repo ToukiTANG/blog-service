@@ -3,7 +3,19 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.touki.blog.mapper.VisitorMapper">
+    <update id="updateRecord">
+        <foreach collection="visitorList" item="visitorUpdateDTO" separator=";">
+            update visitor
+            set pv = pv + #{visitorUpdateDTO.pv}, last_time = #{visitorUpdateDTO.time}
+            where uuid = #{visitorUpdateDTO.uuid}
+        </foreach>
+    </update>
     <select id="hasUUID" resultType="java.lang.Integer">
         select ifnull((select 1 from visitor where uuid = #{uuid} limit 1), 0)
+    </select>
+    <select id="getNewVisitorIpSourceYesterday" resultType="java.lang.String">
+        select ip_source
+        from visitor
+        where date(create_time) = date_sub(curdate(), interval 1 day)
     </select>
 </mapper>

@@ -1,8 +1,12 @@
 package com.touki.blog.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.touki.blog.model.dto.VisitorUpdateDTO;
 import com.touki.blog.model.entity.Visitor;
 import org.springframework.scheduling.annotation.Async;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Touki
@@ -23,4 +27,18 @@ public interface VisitorService extends IService<Visitor> {
      * @return 是否存在
      */
     boolean hasUUID(String identification);
+
+    /**
+     * 更新统计到访客表
+     *
+     * @param visitorList ArrayList<VisitorUpdateDTO>
+     */
+    void updateRecord(ArrayList<VisitorUpdateDTO> visitorList);
+
+    /**
+     * 获取昨天新增访客的ip来源信息
+     *
+     * @return List<String>
+     */
+    List<String> getNewVisitorIpSourceYesterday();
 }
