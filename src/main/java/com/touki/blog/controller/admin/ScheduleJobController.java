@@ -26,6 +26,7 @@ public class ScheduleJobController {
 
     @PreAuthorize("hasAnyRole('admin')")
     @PostMapping("/job/add")
+    @OperationLogger("新增定时任务")
     public Result createJob(@RequestBody NewScheduleJob newScheduleJob) {
         jobService.createJob(newScheduleJob);
         return Result.success();
