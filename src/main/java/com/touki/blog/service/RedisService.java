@@ -123,4 +123,12 @@ public interface RedisService {
      * @param value value
      */
     void saveValueToSet(String key, String value);
+
+    /**
+     * 删除set中的value
+     *
+     * @param key   key
+     * @param value value
+     */
+    void deleteValuInSet(String key, String value);
 }

@@ -135,4 +135,9 @@ public class RedisServiceImpl implements RedisService {
     public void saveValueToSet(String key, String value) {
         redisTemplate.opsForSet().add(key, value);
     }
+
+    @Override
+    public void deleteValuInSet(String key, String value) {
+        redisTemplate.opsForSet().remove(key, value);
+    }
 }

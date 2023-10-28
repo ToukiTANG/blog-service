@@ -3,6 +3,8 @@ package com.touki.blog.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.touki.blog.model.dto.VisitorUpdateDTO;
 import com.touki.blog.model.entity.Visitor;
+import com.touki.blog.model.query.VisitorQuery;
+import com.touki.blog.model.vo.PageResult;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.ArrayList;
@@ -41,4 +43,18 @@ public interface VisitorService extends IService<Visitor> {
      * @return List<String>
      */
     List<String> getNewVisitorIpSourceYesterday();
+
+    /**
+     * 分页查询访客
+     *
+     * @param query VisitorQuery
+     * @return PageResult<Visitor>
+     */
+    PageResult<Visitor> visitorList(VisitorQuery query);
+
+    /**
+     * @param visitorId 访客id
+     * @param uuid      访客标识
+     */
+    void deleteVisitor(Long visitorId, String uuid);
 }
