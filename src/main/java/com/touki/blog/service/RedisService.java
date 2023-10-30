@@ -131,4 +131,12 @@ public interface RedisService {
      * @param value value
      */
     void deleteValuInSet(String key, String value);
+
+    /**
+     * 统计set容量
+     *
+     * @param key key
+     * @return int
+     */
+    int countBySet(String key);
 }

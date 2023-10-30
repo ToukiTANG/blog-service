@@ -33,4 +33,10 @@
         from blog_tag
         where tag_id = #{tagId}
     </select>
+    <select id="tagBlogCount" resultType="com.touki.blog.model.dto.TagBlogCountDTO">
+        select t.tag_name name, count(bt.tag_id) value
+        from blog_tag bt
+                 left join tag t on t.tag_id = bt.tag_id
+        group by bt.tag_id
+    </select>
 </mapper>

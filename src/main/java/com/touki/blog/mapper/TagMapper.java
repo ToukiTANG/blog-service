@@ -1,6 +1,7 @@
 package com.touki.blog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.touki.blog.model.dto.TagBlogCountDTO;
 import com.touki.blog.model.entity.Tag;
 import org.springframework.stereotype.Repository;
 
@@ -42,4 +43,11 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @return List<Long>
      */
     List<Long> blogIds(Long tagId);
+
+    /**
+     * 获取标签下文章计数
+     *
+     * @return List<TagBlogCountDTO>
+     */
+    List<TagBlogCountDTO> tagBlogCount();
 }

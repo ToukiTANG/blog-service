@@ -8,6 +8,7 @@ import com.touki.blog.constant.RespCode;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.mapper.TagMapper;
 import com.touki.blog.model.dto.NewTag;
+import com.touki.blog.model.dto.TagBlogCountDTO;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.vo.PageResult;
 import com.touki.blog.service.TagsService;
@@ -68,5 +69,10 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagsS
     public void updateTag(Tag tag) {
         tag.setUpdateTime(new Date());
         this.updateById(tag);
+    }
+
+    @Override
+    public List<TagBlogCountDTO> tagBlogCount() {
+        return this.baseMapper.tagBlogCount();
     }
 }

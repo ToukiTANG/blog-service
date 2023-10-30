@@ -3,8 +3,11 @@ package com.touki.blog.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.touki.blog.exception.MyException;
 import com.touki.blog.model.dto.NewTag;
+import com.touki.blog.model.dto.TagBlogCountDTO;
 import com.touki.blog.model.entity.Tag;
 import com.touki.blog.model.vo.PageResult;
+
+import java.util.List;
 
 /**
  * @author Touki
@@ -39,4 +42,11 @@ public interface TagsService extends IService<Tag> {
      * @param tag Tag
      */
     void updateTag(Tag tag);
+
+    /**
+     * 获取标签下的文章数量
+     *
+     * @return Map<Long, Integer>
+     */
+    List<TagBlogCountDTO> tagBlogCount();
 }

@@ -5,10 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Touki
@@ -139,5 +136,10 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void deleteValuInSet(String key, String value) {
         redisTemplate.opsForSet().remove(key, value);
+    }
+
+    @Override
+    public int countBySet(String key) {
+        return Optional.ofNullable(redisTemplate.opsForSet().size(key)).orElse(0L).intValue();
     }
 }
