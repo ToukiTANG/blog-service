@@ -18,6 +18,7 @@ import com.touki.blog.util.UserAgentUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,9 @@ public class VisitorServiceImpl extends ServiceImpl<VisitorMapper, Visitor> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRecord(ArrayList<VisitorUpdateDTO> visitorList) {
-        this.baseMapper.updateRecord(visitorList);
+        if (!CollectionUtils.isEmpty(visitorList)) {
+            this.baseMapper.updateRecord(visitorList);
+        }
     }
 
     @Override
